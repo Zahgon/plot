@@ -5,13 +5,10 @@
 package plotter
 
 import (
-	"image"
 	"image/color"
-	"math"
 
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/palette"
-	"gonum.org/v1/plot/vg"
 	"gonum.org/v1/plot/vg/draw"
 )
 
@@ -69,206 +66,34 @@ type HeatMap struct {
 // a float, those returned values are used to set the respective HeatMap
 // fields. If the returned HeatMap is used when Min is greater than Max,
 // the Plot method will panic.
-func NewHeatMap(g GridXYZ, p palette.Palette) *HeatMap {
-	var min, max float64
-	type minMaxer interface {
-		Min() float64
-		Max() float64
-	}
-	switch g := g.(type) {
-	case minMaxer:
-		min, max = g.Min(), g.Max()
-	default:
-		min, max = math.Inf(1), math.Inf(-1)
-		c, r := g.Dims()
-		for i := range c {
-			for j := range r {
-				v := g.Z(i, j)
-				if math.IsNaN(v) {
-					continue
-				}
-				min = math.Min(min, v)
-				max = math.Max(max, v)
-			}
-		}
-	}
-
-	return &HeatMap{
-		GridXYZ: g,
-		Palette: p,
-		Min:     min,
-		Max:     max,
-	}
-}
+func NewHeatMap(g GridXYZ, p palette.Palette) *HeatMap { _ = "STUB: not implemented"; return nil }
 
 // Plot implements the Plot method of the plot.Plotter interface.
-func (h *HeatMap) Plot(c draw.Canvas, plt *plot.Plot) {
-	if h.Rasterized {
-		h.plotRasterized(c, plt)
-	} else {
-		h.plotVectorized(c, plt)
-	}
-}
+func (h *HeatMap) Plot(c draw.Canvas, plt *plot.Plot) { _ = "STUB: not implemented"; return }
 
 // plotRasterized plots the heatmap using raster-based drawing.
-func (h *HeatMap) plotRasterized(c draw.Canvas, plt *plot.Plot) {
-	cols, rows := h.GridXYZ.Dims()
-	img := image.NewRGBA64(image.Rectangle{
-		Min: image.Point{X: 0, Y: 0},
-		Max: image.Point{X: cols, Y: rows},
-	})
+func (h *HeatMap) plotRasterized(c draw.Canvas, plt *plot.Plot) { _ = "STUB: not implemented"; return }
 
-	pal := h.Palette.Colors()
-	ps := float64(len(pal)-1) / (h.Max - h.Min)
-	for i := range cols {
-		for j := range rows {
-			var col color.Color
-			switch v := h.GridXYZ.Z(i, j); {
-			case v < h.Min:
-				col = h.Underflow
-			case v > h.Max:
-				col = h.Overflow
-			case math.IsNaN(v), math.IsInf(ps, 0):
-				col = h.NaN
-			default:
-				col = pal[int((v-h.Min)*ps+0.5)] // Apply palette scaling.
-			}
-
-			if col != nil {
-				img.Set(i, rows-j-1, col)
-			}
-		}
-	}
-
-	xmin, xmax, ymin, ymax := h.DataRange()
-	pImg := NewImage(img, xmin, ymin, xmax, ymax)
-	pImg.Plot(c, plt)
-}
+// Apply palette scaling.
 
 // plotVectorized plots the heatmap using vector-based drawing.
-func (h *HeatMap) plotVectorized(c draw.Canvas, plt *plot.Plot) {
-	if h.Min > h.Max {
-		panic("contour: invalid Z range: min greater than max")
-	}
-	pal := h.Palette.Colors()
-	if len(pal) == 0 {
-		panic("heatmap: empty palette")
-	}
-	// ps scales the palette uniformly across the data range.
-	ps := float64(len(pal)-1) / (h.Max - h.Min)
+func (h *HeatMap) plotVectorized(c draw.Canvas, plt *plot.Plot) { _ = "STUB: not implemented"; return }
 
-	trX, trY := plt.Transforms(&c)
+// ps scales the palette uniformly across the data range.
 
-	var pa vg.Path
-	cols, rows := h.GridXYZ.Dims()
-	for i := range cols {
-		var right, left float64
-		switch i {
-		case 0:
-			if cols == 1 {
-				right = 0.5
-			} else {
-				right = (h.GridXYZ.X(1) - h.GridXYZ.X(0)) / 2
-			}
-			left = -right
-		case cols - 1:
-			right = (h.GridXYZ.X(cols-1) - h.GridXYZ.X(cols-2)) / 2
-			left = -right
-		default:
-			right = (h.GridXYZ.X(i+1) - h.GridXYZ.X(i)) / 2
-			left = -(h.GridXYZ.X(i) - h.GridXYZ.X(i-1)) / 2
-		}
-
-		for j := range rows {
-			var up, down float64
-			switch j {
-			case 0:
-				if rows == 1 {
-					up = 0.5
-				} else {
-					up = (h.GridXYZ.Y(1) - h.GridXYZ.Y(0)) / 2
-				}
-				down = -up
-			case rows - 1:
-				up = (h.GridXYZ.Y(rows-1) - h.GridXYZ.Y(rows-2)) / 2
-				down = -up
-			default:
-				up = (h.GridXYZ.Y(j+1) - h.GridXYZ.Y(j)) / 2
-				down = -(h.GridXYZ.Y(j) - h.GridXYZ.Y(j-1)) / 2
-			}
-
-			x, y := trX(h.GridXYZ.X(i)+left), trY(h.GridXYZ.Y(j)+down)
-			dx, dy := trX(h.GridXYZ.X(i)+right), trY(h.GridXYZ.Y(j)+up)
-
-			if !c.Contains(vg.Point{X: x, Y: y}) || !c.Contains(vg.Point{X: dx, Y: dy}) {
-				continue
-			}
-
-			pa = pa[:0]
-			pa.Move(vg.Point{X: x, Y: y})
-			pa.Line(vg.Point{X: dx, Y: y})
-			pa.Line(vg.Point{X: dx, Y: dy})
-			pa.Line(vg.Point{X: x, Y: dy})
-			pa.Close()
-
-			var col color.Color
-			switch v := h.GridXYZ.Z(i, j); {
-			case v < h.Min:
-				col = h.Underflow
-			case v > h.Max:
-				col = h.Overflow
-			case math.IsNaN(v), math.IsInf(ps, 0):
-				col = h.NaN
-			default:
-				col = pal[int((v-h.Min)*ps+0.5)] // Apply palette scaling.
-			}
-			if col != nil {
-				c.SetColor(col)
-				c.Fill(pa)
-			}
-		}
-	}
-}
+// Apply palette scaling.
 
 // DataRange implements the DataRange method
 // of the plot.DataRanger interface.
 func (h *HeatMap) DataRange() (xmin, xmax, ymin, ymax float64) {
-	c, r := h.GridXYZ.Dims()
-	switch c {
-	case 1: // Make a unit length when there is no neighbour.
-		xmax = h.GridXYZ.X(0) + 0.5
-		xmin = h.GridXYZ.X(0) - 0.5
-	default:
-		xmax = h.GridXYZ.X(c-1) + (h.GridXYZ.X(c-1)-h.GridXYZ.X(c-2))/2
-		xmin = h.GridXYZ.X(0) - (h.GridXYZ.X(1)-h.GridXYZ.X(0))/2
-	}
-	switch r {
-	case 1: // Make a unit length when there is no neighbour.
-		ymax = h.GridXYZ.Y(0) + 0.5
-		ymin = h.GridXYZ.Y(0) - 0.5
-	default:
-		ymax = h.GridXYZ.Y(r-1) + (h.GridXYZ.Y(r-1)-h.GridXYZ.Y(r-2))/2
-		ymin = h.GridXYZ.Y(0) - (h.GridXYZ.Y(1)-h.GridXYZ.Y(0))/2
-	}
-	return xmin, xmax, ymin, ymax
+	_ = "STUB: not implemented"
+	return 0, 0, 0, 0
 }
+
+// Make a unit length when there is no neighbour.
+
+// Make a unit length when there is no neighbour.
 
 // GlyphBoxes implements the GlyphBoxes method
 // of the plot.GlyphBoxer interface.
-func (h *HeatMap) GlyphBoxes(plt *plot.Plot) []plot.GlyphBox {
-	c, r := h.GridXYZ.Dims()
-	b := make([]plot.GlyphBox, 0, r*c)
-	for i := range c {
-		for j := range r {
-			b = append(b, plot.GlyphBox{
-				X: plt.X.Norm(h.GridXYZ.X(i)),
-				Y: plt.Y.Norm(h.GridXYZ.Y(j)),
-				Rectangle: vg.Rectangle{
-					Min: vg.Point{X: -5, Y: -5},
-					Max: vg.Point{X: +5, Y: +5},
-				},
-			})
-		}
-	}
-	return b
-}
+func (h *HeatMap) GlyphBoxes(plt *plot.Plot) []plot.GlyphBox { _ = "STUB: not implemented"; return nil }

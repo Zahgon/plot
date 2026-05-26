@@ -5,9 +5,7 @@
 package plotter
 
 import (
-	"errors"
 	"image/color"
-	"math"
 
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/vg"
@@ -54,158 +52,34 @@ type BarChart struct {
 // The bars heights correspond to the values and their x locations correspond
 // to the index of their value in the Valuer.
 func NewBarChart(vs Valuer, width vg.Length) (*BarChart, error) {
-	if width <= 0 {
-		return nil, errors.New("plotter: width parameter was not positive")
-	}
-	values, err := CopyValues(vs)
-	if err != nil {
-		return nil, err
-	}
-	return &BarChart{
-		Values:    values,
-		Width:     width,
-		Color:     color.Black,
-		LineStyle: DefaultLineStyle,
-	}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // BarHeight returns the maximum y value of the
 // ith bar, taking into account any bars upon
 // which it is stacked.
-func (b *BarChart) BarHeight(i int) float64 {
-	ht := 0.0
-	if b == nil {
-		return 0
-	}
-	if i >= 0 && i < len(b.Values) {
-		ht += b.Values[i]
-	}
-	if b.stackedOn != nil {
-		ht += b.stackedOn.BarHeight(i)
-	}
-	return ht
-}
+func (b *BarChart) BarHeight(i int) float64 { _ = "STUB: not implemented"; return 0 }
 
 // StackOn stacks a bar chart on top of another,
 // and sets the XMin and Offset to that of the
 // chart upon which it is being stacked.
-func (b *BarChart) StackOn(on *BarChart) {
-	b.XMin = on.XMin
-	b.Offset = on.Offset
-	b.stackedOn = on
-}
+func (b *BarChart) StackOn(on *BarChart) { _ = "STUB: not implemented"; return }
 
 // Plot implements the plot.Plotter interface.
-func (b *BarChart) Plot(c draw.Canvas, plt *plot.Plot) {
-	trCat, trVal := plt.Transforms(&c)
-	if b.Horizontal {
-		trCat, trVal = trVal, trCat
-	}
-
-	for i, ht := range b.Values {
-		catVal := b.XMin + float64(i)
-		catMin := trCat(float64(catVal))
-		if !b.Horizontal {
-			if !c.ContainsX(catMin) {
-				continue
-			}
-		} else {
-			if !c.ContainsY(catMin) {
-				continue
-			}
-		}
-		catMin = catMin - b.Width/2 + b.Offset
-		catMax := catMin + b.Width
-		bottom := b.stackedOn.BarHeight(i)
-		valMin := trVal(bottom)
-		valMax := trVal(bottom + ht)
-
-		var pts []vg.Point
-		var poly []vg.Point
-		if !b.Horizontal {
-			pts = []vg.Point{
-				{X: catMin, Y: valMin},
-				{X: catMin, Y: valMax},
-				{X: catMax, Y: valMax},
-				{X: catMax, Y: valMin},
-			}
-			poly = c.ClipPolygonY(pts)
-		} else {
-			pts = []vg.Point{
-				{X: valMin, Y: catMin},
-				{X: valMin, Y: catMax},
-				{X: valMax, Y: catMax},
-				{X: valMax, Y: catMin},
-			}
-			poly = c.ClipPolygonX(pts)
-		}
-		c.FillPolygon(b.Color, poly)
-
-		var outline [][]vg.Point
-		if !b.Horizontal {
-			pts = append(pts, vg.Point{X: catMin, Y: valMin})
-			outline = c.ClipLinesY(pts)
-		} else {
-			pts = append(pts, vg.Point{X: valMin, Y: catMin})
-			outline = c.ClipLinesX(pts)
-		}
-		c.StrokeLines(b.LineStyle, outline...)
-	}
-}
+func (b *BarChart) Plot(c draw.Canvas, plt *plot.Plot) { _ = "STUB: not implemented"; return }
 
 // DataRange implements the plot.DataRanger interface.
 func (b *BarChart) DataRange() (xmin, xmax, ymin, ymax float64) {
-	catMin := b.XMin
-	catMax := catMin + float64(len(b.Values)-1)
-
-	valMin := math.Inf(1)
-	valMax := math.Inf(-1)
-	for i, val := range b.Values {
-		valBot := b.stackedOn.BarHeight(i)
-		valTop := valBot + val
-		valMin = math.Min(valMin, math.Min(valBot, valTop))
-		valMax = math.Max(valMax, math.Max(valBot, valTop))
-	}
-	if !b.Horizontal {
-		return catMin, catMax, valMin, valMax
-	}
-	return valMin, valMax, catMin, catMax
+	_ = "STUB: not implemented"
+	return 0, 0, 0, 0
 }
 
 // GlyphBoxes implements the GlyphBoxer interface.
 func (b *BarChart) GlyphBoxes(plt *plot.Plot) []plot.GlyphBox {
-	boxes := make([]plot.GlyphBox, len(b.Values))
-	for i := range b.Values {
-		cat := b.XMin + float64(i)
-		if !b.Horizontal {
-			boxes[i].X = plt.X.Norm(cat)
-			boxes[i].Rectangle = vg.Rectangle{
-				Min: vg.Point{X: b.Offset - b.Width/2},
-				Max: vg.Point{X: b.Offset + b.Width/2},
-			}
-		} else {
-			boxes[i].Y = plt.Y.Norm(cat)
-			boxes[i].Rectangle = vg.Rectangle{
-				Min: vg.Point{Y: b.Offset - b.Width/2},
-				Max: vg.Point{Y: b.Offset + b.Width/2},
-			}
-		}
-	}
-	return boxes
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // Thumbnail fulfills the plot.Thumbnailer interface.
-func (b *BarChart) Thumbnail(c *draw.Canvas) {
-	pts := []vg.Point{
-		{X: c.Min.X, Y: c.Min.Y},
-		{X: c.Min.X, Y: c.Max.Y},
-		{X: c.Max.X, Y: c.Max.Y},
-		{X: c.Max.X, Y: c.Min.Y},
-	}
-	poly := c.ClipPolygonY(pts)
-	c.FillPolygon(b.Color, poly)
-
-	pts = append(pts, vg.Point{X: c.Min.X, Y: c.Min.Y})
-	outline := c.ClipLinesY(pts)
-	c.StrokeLines(b.LineStyle, outline...)
-}
+func (b *BarChart) Thumbnail(c *draw.Canvas) { _ = "STUB: not implemented"; return }

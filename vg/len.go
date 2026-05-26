@@ -12,10 +12,13 @@ type Length = font.Length
 
 // Points returns a length for the given number of points.
 func Points(pt float64) Length {
-	return font.Points(pt)
+	_ = "STUB: not implemented"
+	return *
+
+	// Common lengths.
+	new(Length)
 }
 
-// Common lengths.
 const (
 	Inch       = font.Inch
 	Centimeter = font.Centimeter
@@ -32,6 +35,4 @@ const (
 //   - cm (centimeter)
 //   - in (inch)
 //   - pt (point)
-func ParseLength(value string) (Length, error) {
-	return font.ParseLength(value)
-}
+func ParseLength(value string) (Length, error) { _ = "STUB: not implemented"; return *new(Length), nil }

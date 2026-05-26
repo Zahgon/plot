@@ -5,10 +5,7 @@
 package plotter
 
 import (
-	"errors"
 	"image/color"
-	"math"
-	"sort"
 
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/vg"
@@ -99,211 +96,42 @@ type BoxPlot struct {
 // whiskers stretch) are the minimum and maximum
 // values that are not outside the fences.
 func NewBoxPlot(w vg.Length, loc float64, values Valuer) (*BoxPlot, error) {
-	if w < 0 {
-		return nil, errors.New("plotter: negative boxplot width")
-	}
-
-	b := new(BoxPlot)
-	var err error
-	if b.fiveStatPlot, err = newFiveStat(w, loc, values); err != nil {
-		return nil, err
-	}
-
-	b.Width = w
-	b.CapWidth = 3 * w / 4
-
-	b.GlyphStyle = DefaultGlyphStyle
-	b.BoxStyle = DefaultLineStyle
-	b.MedianStyle = DefaultLineStyle
-	b.WhiskerStyle = draw.LineStyle{
-		Width:  vg.Points(0.5),
-		Dashes: []vg.Length{vg.Points(4), vg.Points(2)},
-	}
-
-	if len(b.Values) == 0 {
-		b.Width = 0
-		b.GlyphStyle.Radius = 0
-		b.BoxStyle.Width = 0
-		b.MedianStyle.Width = 0
-		b.WhiskerStyle.Width = 0
-	}
-
-	return b, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func newFiveStat(w vg.Length, loc float64, values Valuer) (fiveStatPlot, error) {
-	var b fiveStatPlot
-	b.Location = loc
-
-	var err error
-	if b.Values, err = CopyValues(values); err != nil {
-		return fiveStatPlot{}, err
-	}
-
-	sorted := make(Values, len(b.Values))
-	copy(sorted, b.Values)
-	sort.Float64s(sorted)
-
-	if len(sorted) == 1 {
-		b.Median = sorted[0]
-		b.Quartile1 = sorted[0]
-		b.Quartile3 = sorted[0]
-	} else {
-		b.Median = median(sorted)
-		b.Quartile1 = median(sorted[:len(sorted)/2])
-		b.Quartile3 = median(sorted[len(sorted)/2:])
-	}
-	b.Min = sorted[0]
-	b.Max = sorted[len(sorted)-1]
-
-	low := b.Quartile1 - 1.5*(b.Quartile3-b.Quartile1)
-	high := b.Quartile3 + 1.5*(b.Quartile3-b.Quartile1)
-	b.AdjLow = math.Inf(1)
-	b.AdjHigh = math.Inf(-1)
-	for i, v := range b.Values {
-		if v > high || v < low {
-			b.Outside = append(b.Outside, i)
-			continue
-		}
-		if v < b.AdjLow {
-			b.AdjLow = v
-		}
-		if v > b.AdjHigh {
-			b.AdjHigh = v
-		}
-	}
-
-	return b, nil
+	_ = "STUB: not implemented"
+	return *new(fiveStatPlot), nil
 }
 
 // median returns the median value from a
 // sorted Values.
-func median(vs Values) float64 {
-	if len(vs) == 1 {
-		return vs[0]
-	}
-	med := vs[len(vs)/2]
-	if len(vs)%2 == 0 {
-		med += vs[len(vs)/2-1]
-		med /= 2
-	}
-	return med
-}
+func median(vs Values) float64 { _ = "STUB: not implemented"; return 0 }
 
 // Plot draws the BoxPlot on Canvas c and Plot plt.
-func (b *BoxPlot) Plot(c draw.Canvas, plt *plot.Plot) {
-	if b.Horizontal {
-		b := &horizBoxPlot{b}
-		b.Plot(c, plt)
-		return
-	}
-
-	trX, trY := plt.Transforms(&c)
-	x := trX(b.Location)
-	if !c.ContainsX(x) {
-		return
-	}
-	x += b.Offset
-
-	med := trY(b.Median)
-	q1 := trY(b.Quartile1)
-	q3 := trY(b.Quartile3)
-	aLow := trY(b.AdjLow)
-	aHigh := trY(b.AdjHigh)
-
-	pts := []vg.Point{
-		{X: x - b.Width/2, Y: q1},
-		{X: x - b.Width/2, Y: q3},
-		{X: x + b.Width/2, Y: q3},
-		{X: x + b.Width/2, Y: q1},
-		{X: x - b.Width/2 - b.BoxStyle.Width/2, Y: q1},
-	}
-	box := c.ClipLinesY(pts)
-	if b.FillColor != nil {
-		c.FillPolygon(b.FillColor, c.ClipPolygonY(pts))
-	}
-	c.StrokeLines(b.BoxStyle, box...)
-
-	medLine := c.ClipLinesY([]vg.Point{
-		{X: x - b.Width/2, Y: med},
-		{X: x + b.Width/2, Y: med},
-	})
-	c.StrokeLines(b.MedianStyle, medLine...)
-
-	cap := b.CapWidth / 2
-	whisks := c.ClipLinesY(
-		[]vg.Point{{X: x, Y: q3}, {X: x, Y: aHigh}},
-		[]vg.Point{{X: x - cap, Y: aHigh}, {X: x + cap, Y: aHigh}},
-		[]vg.Point{{X: x, Y: q1}, {X: x, Y: aLow}},
-		[]vg.Point{{X: x - cap, Y: aLow}, {X: x + cap, Y: aLow}},
-	)
-	c.StrokeLines(b.WhiskerStyle, whisks...)
-
-	for _, out := range b.Outside {
-		y := trY(b.Value(out))
-		if c.ContainsY(y) {
-			c.DrawGlyphNoClip(b.GlyphStyle, vg.Point{X: x, Y: y})
-		}
-	}
-}
+func (b *BoxPlot) Plot(c draw.Canvas, plt *plot.Plot) { _ = "STUB: not implemented"; return }
 
 // DataRange returns the minimum and maximum x
 // and y values, implementing the plot.DataRanger
 // interface.
 func (b *BoxPlot) DataRange() (float64, float64, float64, float64) {
-	if b.Horizontal {
-		b := &horizBoxPlot{b}
-		return b.DataRange()
-	}
-	return b.Location, b.Location, b.Min, b.Max
+	_ = "STUB: not implemented"
+	return 0, 0, 0, 0
 }
 
 // GlyphBoxes returns a slice of GlyphBoxes for the
 // points and for the median line of the boxplot,
 // implementing the plot.GlyphBoxer interface
-func (b *BoxPlot) GlyphBoxes(plt *plot.Plot) []plot.GlyphBox {
-	if b.Horizontal {
-		b := &horizBoxPlot{b}
-		return b.GlyphBoxes(plt)
-	}
-
-	bs := make([]plot.GlyphBox, len(b.Outside)+1)
-	for i, out := range b.Outside {
-		bs[i].X = plt.X.Norm(b.Location)
-		bs[i].Y = plt.Y.Norm(b.Value(out))
-		bs[i].Rectangle = b.GlyphStyle.Rectangle()
-	}
-	bs[len(bs)-1].X = plt.X.Norm(b.Location)
-	bs[len(bs)-1].Y = plt.Y.Norm(b.Median)
-	bs[len(bs)-1].Rectangle = vg.Rectangle{
-		Min: vg.Point{X: b.Offset - (b.Width/2 + b.BoxStyle.Width/2)},
-		Max: vg.Point{X: b.Offset + (b.Width/2 + b.BoxStyle.Width/2)},
-	}
-	return bs
-}
+func (b *BoxPlot) GlyphBoxes(plt *plot.Plot) []plot.GlyphBox { _ = "STUB: not implemented"; return nil }
 
 // OutsideLabels returns a *Labels that will plot
 // a label for each of the outside points.  The
 // labels are assumed to correspond to the
 // points used to create the box plot.
 func (b *BoxPlot) OutsideLabels(labels Labeller) (*Labels, error) {
-	if b.Horizontal {
-		b := &horizBoxPlot{b}
-		return b.OutsideLabels(labels)
-	}
-
-	strs := make([]string, len(b.Outside))
-	for i, out := range b.Outside {
-		strs[i] = labels.Label(out)
-	}
-	o := boxPlotOutsideLabels{b, strs}
-	ls, err := NewLabels(o)
-	if err != nil {
-		return nil, err
-	}
-	off := 0.5 * b.GlyphStyle.Radius
-	ls.Offset = ls.Offset.Add(vg.Point{X: off, Y: off})
-	return ls, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 type boxPlotOutsideLabels struct {
@@ -311,98 +139,38 @@ type boxPlotOutsideLabels struct {
 	labels []string
 }
 
-func (o boxPlotOutsideLabels) Len() int {
-	return len(o.box.Outside)
-}
+func (o boxPlotOutsideLabels) Len() int { _ = "STUB: not implemented"; return 0 }
 
-func (o boxPlotOutsideLabels) XY(i int) (float64, float64) {
-	return o.box.Location, o.box.Value(o.box.Outside[i])
-}
+func (o boxPlotOutsideLabels) XY(i int) (float64, float64) { _ = "STUB: not implemented"; return 0, 0 }
 
 func (o boxPlotOutsideLabels) Label(i int) string {
-	return o.labels[i]
+	_ = "STUB: not implemented"
+
+	// horizBoxPlot is like a regular BoxPlot, however,
+	// it draws horizontally instead of Vertically.
+	// TODO: Merge code for horizontal and vertical box plots as has been done for
+	// bar charts.
+	return ""
 }
 
-// horizBoxPlot is like a regular BoxPlot, however,
-// it draws horizontally instead of Vertically.
-// TODO: Merge code for horizontal and vertical box plots as has been done for
-// bar charts.
 type horizBoxPlot struct{ *BoxPlot }
 
-func (b horizBoxPlot) Plot(c draw.Canvas, plt *plot.Plot) {
-	trX, trY := plt.Transforms(&c)
-	y := trY(b.Location)
-	if !c.ContainsY(y) {
-		return
-	}
-	y += b.Offset
-
-	med := trX(b.Median)
-	q1 := trX(b.Quartile1)
-	q3 := trX(b.Quartile3)
-	aLow := trX(b.AdjLow)
-	aHigh := trX(b.AdjHigh)
-
-	pts := []vg.Point{
-		{X: q1, Y: y - b.Width/2},
-		{X: q3, Y: y - b.Width/2},
-		{X: q3, Y: y + b.Width/2},
-		{X: q1, Y: y + b.Width/2},
-		{X: q1, Y: y - b.Width/2 - b.BoxStyle.Width/2},
-	}
-	box := c.ClipLinesX(pts)
-	if b.FillColor != nil {
-		c.FillPolygon(b.FillColor, c.ClipPolygonX(pts))
-	}
-	c.StrokeLines(b.BoxStyle, box...)
-
-	medLine := c.ClipLinesX([]vg.Point{
-		{X: med, Y: y - b.Width/2},
-		{X: med, Y: y + b.Width/2},
-	})
-	c.StrokeLines(b.MedianStyle, medLine...)
-
-	cap := b.CapWidth / 2
-	whisks := c.ClipLinesX(
-		[]vg.Point{{X: q3, Y: y}, {X: aHigh, Y: y}},
-		[]vg.Point{{X: aHigh, Y: y - cap}, {X: aHigh, Y: y + cap}},
-		[]vg.Point{{X: q1, Y: y}, {X: aLow, Y: y}},
-		[]vg.Point{{X: aLow, Y: y - cap}, {X: aLow, Y: y + cap}},
-	)
-	c.StrokeLines(b.WhiskerStyle, whisks...)
-
-	for _, out := range b.Outside {
-		x := trX(b.Value(out))
-		if c.ContainsX(x) {
-			c.DrawGlyphNoClip(b.GlyphStyle, vg.Point{X: x, Y: y})
-		}
-	}
-}
+func (b horizBoxPlot) Plot(c draw.Canvas, plt *plot.Plot) { _ = "STUB: not implemented"; return }
 
 // DataRange returns the minimum and maximum x
 // and y values, implementing the plot.DataRanger
 // interface.
 func (b horizBoxPlot) DataRange() (float64, float64, float64, float64) {
-	return b.Min, b.Max, b.Location, b.Location
+	_ = "STUB: not implemented"
+	return 0, 0, 0, 0
 }
 
 // GlyphBoxes returns a slice of GlyphBoxes for the
 // points and for the median line of the boxplot,
 // implementing the plot.GlyphBoxer interface
 func (b horizBoxPlot) GlyphBoxes(plt *plot.Plot) []plot.GlyphBox {
-	bs := make([]plot.GlyphBox, len(b.Outside)+1)
-	for i, out := range b.Outside {
-		bs[i].X = plt.X.Norm(b.Value(out))
-		bs[i].Y = plt.Y.Norm(b.Location)
-		bs[i].Rectangle = b.GlyphStyle.Rectangle()
-	}
-	bs[len(bs)-1].X = plt.X.Norm(b.Median)
-	bs[len(bs)-1].Y = plt.Y.Norm(b.Location)
-	bs[len(bs)-1].Rectangle = vg.Rectangle{
-		Min: vg.Point{Y: b.Offset - (b.Width/2 + b.BoxStyle.Width/2)},
-		Max: vg.Point{Y: b.Offset + (b.Width/2 + b.BoxStyle.Width/2)},
-	}
-	return bs
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // OutsideLabels returns a *Labels that will plot
@@ -410,20 +178,8 @@ func (b horizBoxPlot) GlyphBoxes(plt *plot.Plot) []plot.GlyphBox {
 // labels are assumed to correspond to the
 // points used to create the box plot.
 func (b *horizBoxPlot) OutsideLabels(labels Labeller) (*Labels, error) {
-	strs := make([]string, len(b.Outside))
-	for i, out := range b.Outside {
-		strs[i] = labels.Label(out)
-	}
-	o := horizBoxPlotOutsideLabels{
-		boxPlotOutsideLabels{b.BoxPlot, strs},
-	}
-	ls, err := NewLabels(o)
-	if err != nil {
-		return nil, err
-	}
-	off := 0.5 * b.GlyphStyle.Radius
-	ls.Offset = ls.Offset.Add(vg.Point{X: off, Y: off})
-	return ls, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 type horizBoxPlotOutsideLabels struct {
@@ -431,7 +187,8 @@ type horizBoxPlotOutsideLabels struct {
 }
 
 func (o horizBoxPlotOutsideLabels) XY(i int) (float64, float64) {
-	return o.box.Value(o.box.Outside[i]), o.box.Location
+	_ = "STUB: not implemented"
+	return 0, 0
 }
 
 // ValueLabels implements both the Valuer
@@ -443,15 +200,17 @@ type ValueLabels []struct {
 
 // Len returns the number of items.
 func (vs ValueLabels) Len() int {
-	return len(vs)
+	_ = "STUB: not implemented"
+
+	// Value returns the value of item i.
+	return 0
 }
 
-// Value returns the value of item i.
 func (vs ValueLabels) Value(i int) float64 {
-	return vs[i].Value
+	_ = "STUB: not implemented"
+
+	// Label returns the label of item i.
+	return 0
 }
 
-// Label returns the label of item i.
-func (vs ValueLabels) Label(i int) string {
-	return vs[i].Label
-}
+func (vs ValueLabels) Label(i int) string { _ = "STUB: not implemented"; return "" }

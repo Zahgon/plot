@@ -98,56 +98,34 @@ type CanvasWriterTo interface {
 
 // Initialize sets all of the canvas's values to their
 // initial values.
-func Initialize(c Canvas) {
-	c.SetLineWidth(Points(1))
-	c.SetLineDash([]Length{}, 0)
-	c.SetColor(color.Black)
-}
+func Initialize(c Canvas) { _ = "STUB: not implemented"; return }
 
 type Path []PathComp
 
 // Move moves the current location of the path to
 // the given point.
-func (p *Path) Move(pt Point) {
-	*p = append(*p, PathComp{Type: MoveComp, Pos: pt})
-}
+func (p *Path) Move(pt Point) { _ = "STUB: not implemented"; return }
 
 // Line draws a line from the current point to the
 // given point.
-func (p *Path) Line(pt Point) {
-	*p = append(*p, PathComp{Type: LineComp, Pos: pt})
-}
+func (p *Path) Line(pt Point) { _ = "STUB: not implemented"; return }
 
 // Arc adds an arc to the path defined by the center
 // point of the arc's circle, the radius of the circle
 // and the start and sweep angles.
-func (p *Path) Arc(pt Point, rad Length, s, a float64) {
-	*p = append(*p, PathComp{
-		Type:   ArcComp,
-		Pos:    pt,
-		Radius: rad,
-		Start:  s,
-		Angle:  a,
-	})
-}
+func (p *Path) Arc(pt Point, rad Length, s, a float64) { _ = "STUB: not implemented"; return }
 
 // QuadTo adds a quadratic curve element to the path,
 // given by the control point p1 and end point pt.
-func (p *Path) QuadTo(p1, pt Point) {
-	*p = append(*p, PathComp{Type: CurveComp, Pos: pt, Control: []Point{p1}})
-}
+func (p *Path) QuadTo(p1, pt Point) { _ = "STUB: not implemented"; return }
 
 // CubeTo adds a cubic curve element to the path,
 // given by the control points p1 and p2 and the end point pt.
-func (p *Path) CubeTo(p1, p2, pt Point) {
-	*p = append(*p, PathComp{Type: CurveComp, Pos: pt, Control: []Point{p1, p2}})
-}
+func (p *Path) CubeTo(p1, p2, pt Point) { _ = "STUB: not implemented"; return }
 
 // Close closes the path by connecting the current
 // location to the start location with a line.
-func (p *Path) Close() {
-	*p = append(*p, PathComp{Type: CloseComp})
-}
+func (p *Path) Close() { _ = "STUB: not implemented"; return }
 
 // Constants that tag the type of each path
 // component.

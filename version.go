@@ -7,11 +7,6 @@
 
 package plot
 
-import (
-	"fmt"
-	"runtime/debug"
-)
-
 const root = "gonum.org/v1/plot"
 
 // Version returns the version of Gonum/plot and its checksum. The returned
@@ -25,27 +20,4 @@ const root = "gonum.org/v1/plot"
 // and the replace sum will be returned in place of the original sum.
 //
 // The exact version format returned by Version may change in future.
-func Version() (version, sum string) {
-	b, ok := debug.ReadBuildInfo()
-	if !ok {
-		return "", ""
-	}
-	for _, m := range b.Deps {
-		if m.Path == root {
-			if m.Replace != nil {
-				switch {
-				case m.Replace.Version != "" && m.Replace.Path != "":
-					return fmt.Sprintf("%s=>%s %s", m.Version, m.Replace.Path, m.Replace.Version), m.Replace.Sum
-				case m.Replace.Version != "":
-					return fmt.Sprintf("%s=>%s", m.Version, m.Replace.Version), m.Replace.Sum
-				case m.Replace.Path != "":
-					return fmt.Sprintf("%s=>%s", m.Version, m.Replace.Path), m.Replace.Sum
-				default:
-					return m.Version + "*", m.Sum + "*"
-				}
-			}
-			return m.Version, m.Sum
-		}
-	}
-	return "", ""
-}
+func Version() (version, sum string) { _ = "STUB: not implemented"; return "", "" }

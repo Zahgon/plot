@@ -15,9 +15,7 @@ import (
 // the provided canvases, similar to the Unix tee(1) command.
 //
 // Each drawing operation is sent to each listed canvas, one at a time.
-func MultiCanvas(cs ...Canvas) Canvas {
-	return teeCanvas{cs}
-}
+func MultiCanvas(cs ...Canvas) Canvas { _ = "STUB: not implemented"; return *new(Canvas) }
 
 type teeCanvas struct {
 	cs []Canvas
@@ -26,11 +24,7 @@ type teeCanvas struct {
 // SetLineWidth sets the width of stroked paths.
 // If the width is not positive then stroked lines
 // are not drawn.
-func (tee teeCanvas) SetLineWidth(w Length) {
-	for _, c := range tee.cs {
-		c.SetLineWidth(w)
-	}
-}
+func (tee teeCanvas) SetLineWidth(w Length) { _ = "STUB: not implemented"; return }
 
 // SetLineDash sets the dash pattern for lines.
 // The pattern slice specifies the lengths of
@@ -38,9 +32,8 @@ func (tee teeCanvas) SetLineWidth(w Length) {
 // specifies the distance into the dash pattern
 // to start the dash.
 func (tee teeCanvas) SetLineDash(pattern []Length, offset Length) {
-	for _, c := range tee.cs {
-		c.SetLineDash(pattern, offset)
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
 // SetColor sets the current drawing color.
@@ -48,82 +41,45 @@ func (tee teeCanvas) SetLineDash(pattern []Length, offset Length) {
 // the same, so if you want different fill
 // and stroke colors then you must set a color,
 // draw fills, set a new color and then draw lines.
-func (tee teeCanvas) SetColor(c color.Color) {
-	for _, canvas := range tee.cs {
-		canvas.SetColor(c)
-	}
-}
+func (tee teeCanvas) SetColor(c color.Color) { _ = "STUB: not implemented"; return }
 
 // Rotate applies a rotation transform to the context.
 // The parameter is specified in radians.
-func (tee teeCanvas) Rotate(rad float64) {
-	for _, c := range tee.cs {
-		c.Rotate(rad)
-	}
-}
+func (tee teeCanvas) Rotate(rad float64) { _ = "STUB: not implemented"; return }
 
 // Translate applies a translational transform to the context.
-func (tee teeCanvas) Translate(pt Point) {
-	for _, c := range tee.cs {
-		c.Translate(pt)
-	}
-}
+func (tee teeCanvas) Translate(pt Point) { _ = "STUB: not implemented"; return }
 
 // Scale applies a scaling transform to the context.
-func (tee teeCanvas) Scale(x, y float64) {
-	for _, c := range tee.cs {
-		c.Scale(x, y)
-	}
-}
+func (tee teeCanvas) Scale(x, y float64) { _ = "STUB: not implemented"; return }
 
 // Push saves the current line width, the
 // current dash pattern, the current
 // transforms, and the current color
 // onto a stack so that the state can later
 // be restored by calling Pop().
-func (tee teeCanvas) Push() {
-	for _, c := range tee.cs {
-		c.Push()
-	}
-}
+func (tee teeCanvas) Push() { _ = "STUB: not implemented"; return }
 
 // Pop restores the context saved by the
 // corresponding call to Push().
-func (tee teeCanvas) Pop() {
-	for _, c := range tee.cs {
-		c.Pop()
-	}
-}
+func (tee teeCanvas) Pop() { _ = "STUB: not implemented"; return }
 
 // Stroke strokes the given path.
-func (tee teeCanvas) Stroke(p Path) {
-	for _, c := range tee.cs {
-		c.Stroke(p)
-	}
-}
+func (tee teeCanvas) Stroke(p Path) { _ = "STUB: not implemented"; return }
 
 // Fill fills the given path.
-func (tee teeCanvas) Fill(p Path) {
-	for _, c := range tee.cs {
-		c.Fill(p)
-	}
-}
+func (tee teeCanvas) Fill(p Path) { _ = "STUB: not implemented"; return }
 
 // FillString fills in text at the specified
 // location using the given font.
 // If the font size is zero, the text is not drawn.
 func (tee teeCanvas) FillString(f font.Face, pt Point, text string) {
-	for _, c := range tee.cs {
-		c.FillString(f, pt, text)
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
 // DrawImage draws the image, scaled to fit
 // the destination rectangle.
-func (tee teeCanvas) DrawImage(rect Rectangle, img image.Image) {
-	for _, c := range tee.cs {
-		c.DrawImage(rect, img)
-	}
-}
+func (tee teeCanvas) DrawImage(rect Rectangle, img image.Image) { _ = "STUB: not implemented"; return }
 
 var _ Canvas = (*teeCanvas)(nil)

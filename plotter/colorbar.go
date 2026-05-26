@@ -5,8 +5,6 @@
 package plotter
 
 import (
-	"image"
-
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/palette"
 	"gonum.org/v1/plot/vg/draw"
@@ -30,69 +28,18 @@ type ColorBar struct {
 // colors returns the number of colors to be shown
 // in the legend, substituting invalid values
 // with the default of one color per point.
-func (l *ColorBar) colors(c draw.Canvas) int {
-	if l.Colors > 0 {
-		return l.Colors
-	}
-	if l.Vertical {
-		return int(c.Max.Y - c.Min.Y)
-	}
-	return int(c.Max.X - c.Min.X)
-}
+func (l *ColorBar) colors(c draw.Canvas) int { _ = "STUB: not implemented"; return 0 }
 
 // check determines whether the ColorBar is
 // valid in its current configuration.
-func (l *ColorBar) check() {
-	if l.ColorMap == nil {
-		panic("plotter: nil ColorMap in ColorBar")
-	}
-	if l.ColorMap.Max() == l.ColorMap.Min() {
-		panic("plotter: ColorMap Max==Min")
-	}
-}
+func (l *ColorBar) check() { _ = "STUB: not implemented"; return }
 
 // Plot implements the Plot method of the plot.Plotter interface.
-func (l *ColorBar) Plot(c draw.Canvas, p *plot.Plot) {
-	l.check()
-	colors := l.colors(c)
-	var pImg *Image
-	delta := (l.ColorMap.Max() - l.ColorMap.Min()) / float64(colors)
-	if l.Vertical {
-		img := image.NewNRGBA64(image.Rectangle{
-			Min: image.Point{X: 0, Y: 0},
-			Max: image.Point{X: 1, Y: colors},
-		})
-		for i := range colors {
-			color, err := l.ColorMap.At(l.ColorMap.Min() + delta*float64(i))
-			if err != nil {
-				panic(err)
-			}
-			img.Set(0, colors-1-i, color)
-		}
-		pImg = NewImage(img, 0, l.ColorMap.Min(), 1, l.ColorMap.Max())
-	} else {
-		img := image.NewNRGBA64(image.Rectangle{
-			Min: image.Point{X: 0, Y: 0},
-			Max: image.Point{X: colors, Y: 1},
-		})
-		for i := range colors {
-			color, err := l.ColorMap.At(l.ColorMap.Min() + delta*float64(i))
-			if err != nil {
-				panic(err)
-			}
-			img.Set(i, 0, color)
-		}
-		pImg = NewImage(img, l.ColorMap.Min(), 0, l.ColorMap.Max(), 1)
-	}
-	pImg.Plot(c, p)
-}
+func (l *ColorBar) Plot(c draw.Canvas, p *plot.Plot) { _ = "STUB: not implemented"; return }
 
 // DataRange implements the DataRange method
 // of the plot.DataRanger interface.
 func (l *ColorBar) DataRange() (xmin, xmax, ymin, ymax float64) {
-	l.check()
-	if l.Vertical {
-		return 0, 1, l.ColorMap.Min(), l.ColorMap.Max()
-	}
-	return l.ColorMap.Min(), l.ColorMap.Max(), 0, 1
+	_ = "STUB: not implemented"
+	return 0, 0, 0, 0
 }

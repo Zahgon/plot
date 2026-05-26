@@ -37,20 +37,12 @@ var SoftColors = []color.Color{
 	rgb(215, 127, 180),
 }
 
-func rgb(r, g, b uint8) color.RGBA {
-	return color.RGBA{r, g, b, 255}
-}
+func rgb(r, g, b uint8) color.RGBA { _ = "STUB: not implemented"; return *new(color.RGBA) }
 
 // Color returns the ith default color, wrapping
 // if i is less than zero or greater than the max
 // number of colors in the DefaultColors slice.
-func Color(i int) color.Color {
-	n := len(DefaultColors)
-	if i < 0 {
-		return DefaultColors[i%n+n]
-	}
-	return DefaultColors[i%n]
-}
+func Color(i int) color.Color { _ = "STUB: not implemented"; return *new(color.Color) }
 
 // DefaultGlyphShapes is a set of GlyphDrawers used by
 // the Shape function.
@@ -69,13 +61,7 @@ var DefaultGlyphShapes = []draw.GlyphDrawer{
 // wrapping if i is less than zero or greater
 // than the max number of GlyphDrawers
 // in the DefaultGlyphShapes slice.
-func Shape(i int) draw.GlyphDrawer {
-	n := len(DefaultGlyphShapes)
-	if i < 0 {
-		return DefaultGlyphShapes[i%n+n]
-	}
-	return DefaultGlyphShapes[i%n]
-}
+func Shape(i int) draw.GlyphDrawer { _ = "STUB: not implemented"; return *new(draw.GlyphDrawer) }
 
 // DefaultDashes is a set of dash patterns used by
 // the Dashes function.
@@ -107,10 +93,4 @@ var DefaultDashes = [][]vg.Length{
 // wrapping if i is less than zero or greater
 // than the max number of dash patters
 // in the DefaultDashes slice.
-func Dashes(i int) []vg.Length {
-	n := len(DefaultDashes)
-	if i < 0 {
-		return DefaultDashes[i%n+n]
-	}
-	return DefaultDashes[i%n]
-}
+func Dashes(i int) []vg.Length { _ = "STUB: not implemented"; return nil }

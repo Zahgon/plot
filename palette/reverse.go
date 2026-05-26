@@ -9,9 +9,7 @@ import (
 )
 
 // Reverse reverses the direction of ColorMap c.
-func Reverse(c ColorMap) ColorMap {
-	return reverse{ColorMap: c}
-}
+func Reverse(c ColorMap) ColorMap { _ = "STUB: not implemented"; return *new(ColorMap) }
 
 // reverse is a ColorMap that reverses the direction of the ColorMap it
 // contains.
@@ -21,15 +19,9 @@ type reverse struct {
 
 // At implements the ColorMap interface for a Reversed ColorMap.
 func (r reverse) At(v float64) (color.Color, error) {
-	return r.ColorMap.At(r.Max() - (v - r.Min()))
+	_ = "STUB: not implemented"
+	return *new(color.Color), nil
 }
 
 // Palette implements the ColorMap interface for a Reversed ColorMap.
-func (r reverse) Palette(colors int) Palette {
-	c := r.ColorMap.Palette(colors).Colors()
-	c2 := make([]color.Color, len(c))
-	for i, j := 0, len(c)-1; i < j; i, j = i+1, j-1 {
-		c2[i], c2[j] = c[j], c[i]
-	}
-	return palette(c2)
-}
+func (r reverse) Palette(colors int) Palette { _ = "STUB: not implemented"; return *new(Palette) }

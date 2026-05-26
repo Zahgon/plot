@@ -18,14 +18,12 @@
 package main
 
 import (
-	"bufio"
 	"encoding/xml"
 	"flag"
 	"fmt"
 	"image/color"
 	"os"
 	"reflect"
-	"strconv"
 	"strings"
 )
 
@@ -68,71 +66,9 @@ var (
 	class     = map[string]string{"Diverging": "Diverging", "Qualitative": "NonDiverging", "Sequential": "NonDiverging"}
 )
 
-func mustAtoi(f string, base int) byte {
-	i, err := strconv.ParseUint(f, base, 8)
-	if err != nil {
-		panic(err)
-	}
-	return byte(i)
-}
+func mustAtoi(f string, base int) byte { _ = "STUB: not implemented"; return 0 }
 
-func getLetters(f string) map[string]map[color.RGBA]byte {
-	letters := make(map[string]map[color.RGBA]byte)
-
-	lf, err := os.Open(f)
-	if err != nil {
-		fmt.Printf("error: %v", err)
-		os.Exit(1)
-	}
-
-	label := make(map[string]int)
-	scanner := bufio.NewScanner(lf)
-	var (
-		lastType string
-
-		last = make(map[string]string)
-	)
-
-	for scanner.Scan() {
-		line := scanner.Text()
-		if len(strings.TrimSpace(line)) == 0 {
-			break
-		}
-		fields := strings.Split(line, delim)
-		if fields[0] == "ColorName" {
-			for i, f := range fields {
-				label[f] = i
-			}
-			continue
-		}
-		if name := fields[label["ColorName"]]; len(name) != 0 {
-			l, ok := letters[name]
-			if !ok {
-				l = make(map[color.RGBA]byte)
-				letters[name] = l
-			}
-			if len(fields) > label["SchemeType"] {
-				if typ := fields[label["SchemeType"]]; len(typ) != 0 {
-					lastType = typ
-				}
-			}
-			if name != last[lastType] {
-				last[lastType] = name
-			}
-		}
-		letters[last[lastType]][color.RGBA{
-			R: mustAtoi(fields[label["R"]], 10),
-			G: mustAtoi(fields[label["G"]], 10),
-			B: mustAtoi(fields[label["B"]], 10),
-		}] = fields[label["ColorLetter"]][0]
-	}
-	if err := scanner.Err(); err != nil {
-		fmt.Fprintln(os.Stderr, "reading standard input:", err)
-		os.Exit(1)
-	}
-
-	return letters
-}
+func getLetters(f string) map[string]map[color.RGBA]byte { _ = "STUB: not implemented"; return nil }
 
 func main() {
 	var cols Colors

@@ -5,9 +5,7 @@
 package moreland
 
 import (
-	"fmt"
 	"image/color"
-	"math"
 
 	"gonum.org/v1/plot/palette"
 )
@@ -48,7 +46,8 @@ type smoothDiverging struct {
 // convergeM specifies the color of the convergence point; it does not
 // specify the location of the convergence point.
 func NewSmoothDiverging(start, end color.Color, convergeM float64) palette.DivergingColorMap {
-	return newSmoothDiverging(colorToMSH(start), colorToMSH(end), convergeM)
+	_ = "STUB: not implemented"
+	return *new(palette.DivergingColorMap)
 }
 
 // newSmoothDiverging creates a new smooth diverging ColorMap
@@ -57,210 +56,105 @@ func NewSmoothDiverging(start, end color.Color, convergeM float64) palette.Diver
 // convergeM specifies the color of the convergence point; it does not
 // specify the location of the convergence point.
 func newSmoothDiverging(start, end msh, convergeM float64) palette.DivergingColorMap {
-	return &smoothDiverging{
-		start:         start,
-		end:           end,
-		convergeM:     convergeM,
-		convergePoint: math.NaN(),
-		alpha:         1,
-	}
+	_ = "STUB: not implemented"
+	return *new(palette.DivergingColorMap)
 }
 
 // At implements the palette.ColorMap interface.
 func (p *smoothDiverging) At(v float64) (color.Color, error) {
-	if err := checkRange(p.min, p.max, v); err != nil {
-		return nil, err
-	}
-	convergePoint := (p.convergePoint - p.min) / (p.max - p.min)
-	scalar := (v - p.min) / (p.max - p.min)
-	o := p.interpolateMSHDiverging(scalar, convergePoint).cieLAB().cieXYZ().rgb().sRGBA(p.alpha)
-	if !inUnitRange(o.R) || !inUnitRange(o.G) || !inUnitRange(o.B) || !inUnitRange(o.A) {
-		return nil, fmt.Errorf("moreland: invalid color r:%g, g:%g, b:%g, a:%g", o.R, o.G, o.B, o.A)
-	}
-	return o, nil
+	_ = "STUB: not implemented"
+	return *new(color.Color), nil
 }
 
-func inUnitRange(v float64) bool { return 0 <= v && v <= 1 }
+func inUnitRange(v float64) bool { _ = "STUB: not implemented"; return false }
 
 // SetMax implements the palette.ColorMap interface.
-func (p *smoothDiverging) SetMax(v float64) {
-	p.max = v
-	p.convergePoint = (p.min + p.max) / 2
-}
+func (p *smoothDiverging) SetMax(v float64) { _ = "STUB: not implemented"; return }
 
 // SetMin implements the palette.ColorMap interface.
-func (p *smoothDiverging) SetMin(v float64) {
-	p.min = v
-	p.convergePoint = (p.min + p.max) / 2
-}
+func (p *smoothDiverging) SetMin(v float64) { _ = "STUB: not implemented"; return }
 
 // Max implements the palette.ColorMap interface.
 func (p *smoothDiverging) Max() float64 {
-	return p.max
+	_ = "STUB: not implemented"
+
+	// Min implements the palette.ColorMap interface.
+	return 0
 }
 
-// Min implements the palette.ColorMap interface.
 func (p *smoothDiverging) Min() float64 {
-	return p.min
+	_ = "STUB: not implemented"
+
+	// SetAlpha sets the opacity value of this color map. Zero is transparent
+	// and one is completely opaque.
+	// The function will panic is alpha is not between zero and one.
+	return 0
 }
 
-// SetAlpha sets the opacity value of this color map. Zero is transparent
-// and one is completely opaque.
-// The function will panic is alpha is not between zero and one.
-func (p *smoothDiverging) SetAlpha(alpha float64) {
-	if !inUnitRange(alpha) {
-		panic(fmt.Errorf("invalid alpha: %g", alpha))
-	}
-	p.alpha = alpha
-}
+func (p *smoothDiverging) SetAlpha(alpha float64) { _ = "STUB: not implemented"; return }
 
 // Alpha returns the opacity value of this color map.
 func (p *smoothDiverging) Alpha() float64 {
-	return p.alpha
+	_ = "STUB: not implemented"
+
+	// SetConvergePoint sets the value where the diverging colors
+	// should meet.
+	return 0
 }
 
-// SetConvergePoint sets the value where the diverging colors
-// should meet.
-func (p *smoothDiverging) SetConvergePoint(val float64) {
-	if val > p.Max() || val < p.Min() {
-		panic(fmt.Errorf("moreland: convergence point (%g) must be between min (%g) and max (%g)",
-			val, p.Min(), p.Max()))
-	}
-	p.convergePoint = val
-}
+func (p *smoothDiverging) SetConvergePoint(val float64) { _ = "STUB: not implemented"; return }
 
 // ConvergePoint returns the value where the diverging colors meet.
-func (p *smoothDiverging) ConvergePoint() float64 {
-	return p.convergePoint
-}
+func (p *smoothDiverging) ConvergePoint() float64 { _ = "STUB: not implemented"; return 0 }
 
 // interpolateMSHDiverging performs a color interpolation through MSH space,
 // where scalar is a number between 0 and 1 that the
 // color should be evaluated at, and convergePoint is a number between 0 and
 // 1 where the colors should converge.
 func (p *smoothDiverging) interpolateMSHDiverging(scalar, convergePoint float64) msh {
-	startHTwist := hueTwist(p.start, p.convergeM)
-	endHTwist := hueTwist(p.end, p.convergeM)
-	if scalar < convergePoint {
-		// interpolation factor
-		interp := scalar / convergePoint
-		return msh{
-			M: float64((p.convergeM-p.start.M)*interp) + p.start.M,
-			S: p.start.S * (1 - interp),
-			H: p.start.H + float64(startHTwist*interp),
-		}
-	}
-	// interpolation factors
-	interp1 := (scalar - 1) / (convergePoint - 1)
-	interp2 := (scalar/convergePoint - 1)
-	var H float64
-	if scalar > convergePoint {
-		H = p.end.H + float64(endHTwist*interp1)
-	}
-	return msh{
-		M: float64((p.convergeM-p.end.M)*interp1) + p.end.M,
-		S: p.end.S * interp2,
-		H: H,
-	}
+	_ = "STUB: not implemented"
+	return *new(msh)
 }
+
+// interpolation factor
+
+// interpolation factors
 
 // Palette returns a palette.Palette with the specified number of colors.
 func (p smoothDiverging) Palette(n int) palette.Palette {
-	if p.Max() == 0 && p.Min() == 0 {
-		p.SetMin(0)
-		p.SetMax(1)
-	}
-	delta := (p.max - p.min) / float64(n-1)
-	var v float64
-	c := make([]color.Color, n)
-	for i := range c {
-		if i == n-1 {
-			// Avoid potential overflow on last element
-			// due to floating point error.
-			v = p.max
-		} else {
-			v = p.min + float64(delta*float64(i))
-		}
-		var err error
-		c[i], err = p.At(v)
-		if err != nil {
-			panic(err)
-		}
-	}
-	return plte(c)
+	_ = "STUB: not implemented"
+	return *new(palette.Palette)
 }
+
+// Avoid potential overflow on last element
+// due to floating point error.
 
 // SmoothBlueRed is a SmoothDiverging-class ColorMap ranging from blue to red.
 func SmoothBlueRed() palette.DivergingColorMap {
-	start := msh{
-		M: 80,
-		S: 1.08,
-		H: -1.1,
-	}
-	end := msh{
-		M: 80,
-		S: 1.08,
-		H: 0.5,
-	}
-	return newSmoothDiverging(start, end, 88)
+	_ = "STUB: not implemented"
+	return *new(palette.DivergingColorMap)
 }
 
 // SmoothPurpleOrange is a SmoothDiverging-class ColorMap ranging from purple to orange.
 func SmoothPurpleOrange() palette.DivergingColorMap {
-	start := msh{
-		M: 64.97539711,
-		S: 0.899434815,
-		H: -0.899431964,
-	}
-	end := msh{
-		M: 85.00850996,
-		S: 0.949730284,
-		H: 0.950636521,
-	}
-	return newSmoothDiverging(start, end, 88)
+	_ = "STUB: not implemented"
+	return *new(palette.DivergingColorMap)
 }
 
 // SmoothGreenPurple is a SmoothDiverging-class ColorMap ranging from green to purple.
 func SmoothGreenPurple() palette.DivergingColorMap {
-	start := msh{
-		M: 78.04105346,
-		S: 0.885011982,
-		H: 2.499491379,
-	}
-	end := msh{
-		M: 64.97539711,
-		S: 0.899434815,
-		H: -0.899431964,
-	}
-	return newSmoothDiverging(start, end, 88)
+	_ = "STUB: not implemented"
+	return *new(palette.DivergingColorMap)
 }
 
 // SmoothBlueTan is a SmoothDiverging-class ColorMap ranging from blue to tan.
 func SmoothBlueTan() palette.DivergingColorMap {
-	start := msh{
-		M: 79.94788321,
-		S: 0.798754784,
-		H: -1.401313221,
-	}
-	end := msh{
-		M: 80.07193125,
-		S: 0.799798811,
-		H: 1.401089787,
-	}
-	return newSmoothDiverging(start, end, 88)
+	_ = "STUB: not implemented"
+	return *new(palette.DivergingColorMap)
 }
 
 // SmoothGreenRed is a SmoothDiverging-class ColorMap ranging from green to red.
 func SmoothGreenRed() palette.DivergingColorMap {
-	start := msh{
-		M: 78.04105346,
-		S: 0.885011982,
-		H: 2.499491379,
-	}
-	end := msh{
-		M: 76.96722122,
-		S: 0.949483656,
-		H: 0.499492043,
-	}
-	return newSmoothDiverging(start, end, 88)
+	_ = "STUB: not implemented"
+	return *new(palette.DivergingColorMap)
 }

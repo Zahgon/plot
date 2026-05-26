@@ -5,14 +5,10 @@
 package font
 
 import (
-	"errors"
-	"fmt"
 	"sync"
 
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/opentype"
-	"golang.org/x/image/font/sfnt"
-	"golang.org/x/image/math/fixed"
 )
 
 // DefaultCache is the global cache for fonts.
@@ -40,32 +36,10 @@ type Font struct {
 }
 
 // Name returns a fully qualified name for the given font.
-func (f *Font) Name() string {
-	v := f.Variant
-	w := weightName(f.Weight)
-	s := styleName(f.Style)
-
-	switch f.Style {
-	case font.StyleNormal:
-		s = ""
-		if f.Weight == font.WeightNormal {
-			w = "Regular"
-		}
-	default:
-		if f.Weight == font.WeightNormal {
-			w = ""
-		}
-	}
-
-	return fmt.Sprintf("%s%s-%s%s", f.Typeface, v, w, s)
-}
+func (f *Font) Name() string { _ = "STUB: not implemented"; return "" }
 
 // From returns a copy of the provided font with its size set.
-func From(fnt Font, size Length) Font {
-	o := fnt
-	o.Size = size
-	return o
-}
+func From(fnt Font, size Length) Font { _ = "STUB: not implemented"; return *new(Font) }
 
 // Typeface identifies a particular typeface design.
 // The empty string denotes the default typeface.
@@ -98,86 +72,29 @@ type Face struct {
 }
 
 // Name returns a fully qualified name for the given font.
-func (f *Face) Name() string {
-	return f.Font.Name()
-}
+func (f *Face) Name() string { _ = "STUB: not implemented"; return "" }
 
 // FontFace returns the opentype font face for the requested
 // dots-per-inch resolution.
-func (f *Face) FontFace(dpi float64) font.Face {
-	face, err := opentype.NewFace(f.Face, &opentype.FaceOptions{
-		Size: f.Font.Size.Points(),
-		DPI:  dpi,
-	})
-	if err != nil {
-		panic(err)
-	}
-	return face
-}
+func (f *Face) FontFace(dpi float64) font.Face { _ = "STUB: not implemented"; return *new(font.Face) }
 
 // default hinting for OpenType fonts
 const defaultHinting = font.HintingNone
 
 // Extents returns the FontExtents for a font.
 func (f *Face) Extents() Extents {
-	var (
-		// TODO(sbinet): re-use a Font-level sfnt.Buffer instead?
-		buf  sfnt.Buffer
-		ppem = fixed.Int26_6(f.Face.UnitsPerEm())
-	)
+	_ = "STUB: not implemented"
 
-	met, err := f.Face.Metrics(&buf, ppem, defaultHinting)
-	if err != nil {
-		panic(fmt.Errorf("could not extract font extents: %v", err))
-	}
-	scale := f.Font.Size / Points(float64(ppem))
-	return Extents{
-		Ascent:  Points(float64(met.Ascent)) * scale,
-		Descent: Points(float64(met.Descent)) * scale,
-		Height:  Points(float64(met.Height)) * scale,
-	}
+	// TODO(sbinet): re-use a Font-level sfnt.Buffer instead?
+	return *new(Extents)
 }
 
 // Width returns width of a string when drawn using the font.
-func (f *Face) Width(s string) Length {
-	var (
-		pixelsPerEm = fixed.Int26_6(f.Face.UnitsPerEm())
+func (f *Face) Width(s string) Length { _ = "STUB: not implemented"; return *new(Length) }
 
-		// scale converts sfnt.Unit to float64
-		scale = f.Font.Size / Points(float64(pixelsPerEm))
+// scale converts sfnt.Unit to float64
 
-		width     = 0
-		hasPrev   = false
-		buf       sfnt.Buffer
-		prev, idx sfnt.GlyphIndex
-		hinting   = defaultHinting
-	)
-	for _, rune := range s {
-		var err error
-		idx, err = f.Face.GlyphIndex(&buf, rune)
-		if err != nil {
-			panic(fmt.Errorf("could not get glyph index: %v", err))
-		}
-		if hasPrev {
-			kern, err := f.Face.Kern(&buf, prev, idx, pixelsPerEm, hinting)
-			switch {
-			case err == nil:
-				width += int(kern)
-			case errors.Is(err, sfnt.ErrNotFound):
-				// no-op
-			default:
-				panic(fmt.Errorf("could not get kerning: %v", err))
-			}
-		}
-		adv, err := f.Face.GlyphAdvance(&buf, idx, pixelsPerEm, hinting)
-		if err != nil {
-			panic(fmt.Errorf("could not retrieve glyph's advance: %v", err))
-		}
-		width += int(adv)
-		prev, hasPrev = idx, true
-	}
-	return Points(float64(width)) * scale
-}
+// no-op
 
 // Collection is a collection of fonts, regrouped under a common typeface.
 type Collection []Face
@@ -199,137 +116,33 @@ type Cache struct {
 //
 // FIXME(sbinet): perhaps encode/decode Cache.def typeface?
 
-func (c *Cache) GobEncode() ([]byte, error) { return nil, nil }
-func (c *Cache) GobDecode([]byte) error {
-	if c.faces == nil {
-		c.faces = make(map[Font]*opentype.Font)
-	}
-	return nil
-}
+func (c *Cache) GobEncode() ([]byte, error) { _ = "STUB: not implemented"; return nil, nil }
+func (c *Cache) GobDecode([]byte) error     { _ = "STUB: not implemented"; return nil }
 
 // NewCache creates a new cache of fonts from the provided collection of
 // font Faces.
 // The first font Face in the collection is set to be the default one.
-func NewCache(coll Collection) *Cache {
-	cache := &Cache{
-		faces: make(map[Font]*opentype.Font, len(coll)),
-	}
-	cache.Add(coll)
-	return cache
-}
+func NewCache(coll Collection) *Cache { _ = "STUB: not implemented"; return nil }
 
 // Add adds a whole collection of font Faces to the font cache.
 // If the cache is empty, the first font Face in the collection is set
 // to be the default one.
-func (c *Cache) Add(coll Collection) {
-	c.mu.Lock()
-	defer c.mu.Unlock()
+func (c *Cache) Add(coll Collection) { _ = "STUB: not implemented"; return }
 
-	if c.faces == nil {
-		c.faces = make(map[Font]*opentype.Font, len(coll))
-	}
-	for i, f := range coll {
-		if i == 0 && c.def == "" {
-			c.def = f.Font.Typeface
-		}
-		fnt := f.Font
-		fnt.Size = 0 // store all font descriptors with the same size.
-		c.faces[fnt] = f.Face
-	}
-}
+// store all font descriptors with the same size.
 
 // Lookup returns the font Face corresponding to the provided Font descriptor,
 // with the provided font size set.
 //
 // If no matching font Face could be found, the one corresponding to
 // the default typeface is selected and returned.
-func (c *Cache) Lookup(fnt Font, size Length) Face {
-	c.mu.RLock()
-	defer c.mu.RUnlock()
-
-	if len(c.faces) == 0 {
-		return Face{}
-	}
-
-	face := c.lookup(fnt)
-	if face == nil {
-		fnt.Typeface = c.def
-		face = c.lookup(fnt)
-	}
-
-	ff := Face{
-		Font: fnt,
-		Face: face,
-	}
-	ff.Font.Size = size
-	return ff
-}
+func (c *Cache) Lookup(fnt Font, size Length) Face { _ = "STUB: not implemented"; return *new(Face) }
 
 // Has returns whether the cache contains the exact font descriptor.
-func (c *Cache) Has(fnt Font) bool {
-	c.mu.RLock()
-	defer c.mu.RUnlock()
+func (c *Cache) Has(fnt Font) bool { _ = "STUB: not implemented"; return false }
 
-	face := c.lookup(fnt)
-	return face != nil
-}
+func (c *Cache) lookup(key Font) *opentype.Font { _ = "STUB: not implemented"; return nil }
 
-func (c *Cache) lookup(key Font) *opentype.Font {
-	key.Size = 0
+func weightName(w font.Weight) string { _ = "STUB: not implemented"; return "" }
 
-	tf := c.faces[key]
-	if tf == nil {
-		key := key
-		key.Weight = font.WeightNormal
-		tf = c.faces[key]
-	}
-	if tf == nil {
-		key := key
-		key.Style = font.StyleNormal
-		tf = c.faces[key]
-	}
-	if tf == nil {
-		key := key
-		key.Style = font.StyleNormal
-		key.Weight = font.WeightNormal
-		tf = c.faces[key]
-	}
-
-	return tf
-}
-
-func weightName(w font.Weight) string {
-	switch w {
-	case font.WeightThin:
-		return "Thin"
-	case font.WeightExtraLight:
-		return "ExtraLight"
-	case font.WeightLight:
-		return "Light"
-	case font.WeightNormal:
-		return "Regular"
-	case font.WeightMedium:
-		return "Medium"
-	case font.WeightSemiBold:
-		return "SemiBold"
-	case font.WeightBold:
-		return "Bold"
-	case font.WeightExtraBold:
-		return "ExtraBold"
-	case font.WeightBlack:
-		return "Black"
-	}
-	return fmt.Sprintf("weight(%d)", w)
-}
-
-func styleName(sty font.Style) string {
-	switch sty {
-	case font.StyleNormal:
-		return "Normal"
-	case font.StyleItalic:
-		return "Italic"
-	case font.StyleOblique:
-		return "Oblique"
-	}
-	return fmt.Sprintf("style(%d)", sty)
-}
+func styleName(sty font.Style) string { _ = "STUB: not implemented"; return "" }

@@ -17,64 +17,12 @@ type point struct {
 type Curve []point
 
 // NewCurve returns a Curve initialized with the control points in cp.
-func New(cp ...vg.Point) Curve {
-	if len(cp) == 0 {
-		return nil
-	}
-	c := make(Curve, len(cp))
-	for i, p := range cp {
-		c[i].Point = p
-	}
-
-	var w vg.Length
-	for i, p := range c {
-		switch i {
-		case 0:
-			w = 1
-		case 1:
-			w = vg.Length(len(c)) - 1
-		default:
-			w *= vg.Length(len(c)-i) / vg.Length(i)
-		}
-		c[i].Control.X = p.Point.X * w
-		c[i].Control.Y = p.Point.Y * w
-	}
-
-	return c
-}
+func New(cp ...vg.Point) Curve { _ = "STUB: not implemented"; return *new(Curve) }
 
 // Point returns the point at t along the curve, where 0 ≤ t ≤ 1.
-func (c Curve) Point(t float64) vg.Point {
-	c[0].Point = c[0].Control
-	u := t
-	for i, p := range c[1:] {
-		c[i+1].Point = vg.Point{
-			X: p.Control.X * vg.Length(u),
-			Y: p.Control.Y * vg.Length(u),
-		}
-		u *= t
-	}
-
-	var (
-		t1 = 1 - t
-		tt = t1
-	)
-	p := c[len(c)-1].Point
-	for i := len(c) - 2; i >= 0; i-- {
-		p.X += c[i].Point.X * vg.Length(tt)
-		p.Y += c[i].Point.Y * vg.Length(tt)
-		tt *= t1
-	}
-
-	return p
-}
+func (c Curve) Point(t float64) vg.Point { _ = "STUB: not implemented"; return *new(vg.Point) }
 
 // Curve returns a slice of vg.Point, p, filled with points along the Bézier curve described by c.
 // If the length of p is less than 2, the curve points are undefined. The length of p is not
 // altered by the call.
-func (c Curve) Curve(p []vg.Point) []vg.Point {
-	for i, nf := 0, float64(len(p)-1); i < len(p); i++ {
-		p[i] = c.Point(float64(i) / nf)
-	}
-	return p
-}
+func (c Curve) Curve(p []vg.Point) []vg.Point { _ = "STUB: not implemented"; return nil }

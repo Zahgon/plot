@@ -17,7 +17,6 @@ package plotter // import "gonum.org/v1/plot/plotter"
 import (
 	"errors"
 	"image/color"
-	"math"
 
 	"gonum.org/v1/plot/vg"
 	"gonum.org/v1/plot/vg/draw"
@@ -52,16 +51,7 @@ type Valuer interface {
 }
 
 // Range returns the minimum and maximum values.
-func Range(vs Valuer) (min, max float64) {
-	min = math.Inf(1)
-	max = math.Inf(-1)
-	for i := range vs.Len() {
-		v := vs.Value(i)
-		min = math.Min(min, v)
-		max = math.Max(max, v)
-	}
-	return
-}
+func Range(vs Valuer) (min, max float64) { _ = "STUB: not implemented"; return 0, 0 }
 
 // Values implements the Valuer interface.
 type Values []float64
@@ -73,44 +63,22 @@ var (
 )
 
 // CheckFloats returns an error if any of the arguments are NaN or Infinity.
-func CheckFloats(fs ...float64) error {
-	for _, f := range fs {
-		switch {
-		case math.IsNaN(f):
-			return ErrNaN
-		case math.IsInf(f, 0):
-			return ErrInfinity
-		}
-	}
-	return nil
-}
+func CheckFloats(fs ...float64) error { _ = "STUB: not implemented"; return nil }
 
 // CopyValues returns a Values that is a copy of the values
 // from a Valuer, or an error if there are no values, or if one of
 // the copied values is a NaN or Infinity.
-func CopyValues(vs Valuer) (Values, error) {
-	if vs.Len() == 0 {
-		return nil, ErrNoData
-	}
-	cpy := make(Values, vs.Len())
-	for i := range vs.Len() {
-		cpy[i] = vs.Value(i)
-		if err := CheckFloats(cpy[i]); err != nil {
-			return nil, err
-		}
-	}
-	return cpy, nil
-}
+func CopyValues(vs Valuer) (Values, error) { _ = "STUB: not implemented"; return *new(Values), nil }
 
-func (vs Values) Len() int {
-	return len(vs)
-}
+func (vs Values) Len() int { _ = "STUB: not implemented"; return 0 }
 
 func (vs Values) Value(i int) float64 {
-	return vs[i]
+	_ = "STUB: not implemented"
+
+	// XYer wraps the Len and XY methods.
+	return 0
 }
 
-// XYer wraps the Len and XY methods.
 type XYer interface {
 	// Len returns the number of x, y pairs.
 	Len() int
@@ -122,9 +90,8 @@ type XYer interface {
 // XYRange returns the minimum and maximum
 // x and y values.
 func XYRange(xys XYer) (xmin, xmax, ymin, ymax float64) {
-	xmin, xmax = Range(XValues{xys})
-	ymin, ymax = Range(YValues{xys})
-	return
+	_ = "STUB: not implemented"
+	return 0, 0, 0, 0
 }
 
 // XYs implements the XYer interface.
@@ -136,35 +103,24 @@ type XY struct{ X, Y float64 }
 // CopyXYs returns an XYs that is a copy of the x and y values from
 // an XYer, or an error if one of the data points contains a NaN or
 // Infinity.
-func CopyXYs(data XYer) (XYs, error) {
-	cpy := make(XYs, data.Len())
-	for i := range cpy {
-		cpy[i].X, cpy[i].Y = data.XY(i)
-		if err := CheckFloats(cpy[i].X, cpy[i].Y); err != nil {
-			return nil, err
-		}
-	}
-	return cpy, nil
-}
+func CopyXYs(data XYer) (XYs, error) { _ = "STUB: not implemented"; return *new(XYs), nil }
 
-func (xys XYs) Len() int {
-	return len(xys)
-}
+func (xys XYs) Len() int { _ = "STUB: not implemented"; return 0 }
 
 func (xys XYs) XY(i int) (float64, float64) {
-	return xys[i].X, xys[i].Y
+	_ = "STUB: not implemented"
+	return 0,
+
+		// XValues implements the Valuer interface,
+		// returning the x value from an XYer.
+		0
 }
 
-// XValues implements the Valuer interface,
-// returning the x value from an XYer.
 type XValues struct {
 	XYer
 }
 
-func (xs XValues) Value(i int) float64 {
-	x, _ := xs.XY(i)
-	return x
-}
+func (xs XValues) Value(i int) float64 { _ = "STUB: not implemented"; return 0 }
 
 // YValues implements the Valuer interface,
 // returning the y value from an XYer.
@@ -172,10 +128,7 @@ type YValues struct {
 	XYer
 }
 
-func (ys YValues) Value(i int) float64 {
-	_, y := ys.XY(i)
-	return y
-}
+func (ys YValues) Value(i int) float64 { _ = "STUB: not implemented"; return 0 }
 
 // XYZer wraps the Len and XYZ methods.
 type XYZer interface {
@@ -197,40 +150,31 @@ type XYZ struct{ X, Y, Z float64 }
 
 // Len implements the Len method of the XYZer interface.
 func (xyz XYZs) Len() int {
-	return len(xyz)
+	_ = "STUB: not implemented"
+
+	// XYZ implements the XYZ method of the XYZer interface.
+	return 0
 }
 
-// XYZ implements the XYZ method of the XYZer interface.
-func (xyz XYZs) XYZ(i int) (float64, float64, float64) {
-	return xyz[i].X, xyz[i].Y, xyz[i].Z
-}
+func (xyz XYZs) XYZ(i int) (float64, float64, float64) { _ = "STUB: not implemented"; return 0, 0, 0 }
 
 // XY implements the XY method of the XYer interface.
 func (xyz XYZs) XY(i int) (float64, float64) {
-	return xyz[i].X, xyz[i].Y
+	_ = "STUB: not implemented"
+	return 0,
+
+		// CopyXYZs copies an XYZer.
+		0
 }
 
-// CopyXYZs copies an XYZer.
-func CopyXYZs(data XYZer) (XYZs, error) {
-	cpy := make(XYZs, data.Len())
-	for i := range cpy {
-		cpy[i].X, cpy[i].Y, cpy[i].Z = data.XYZ(i)
-		if err := CheckFloats(cpy[i].X, cpy[i].Y, cpy[i].Z); err != nil {
-			return nil, err
-		}
-	}
-	return cpy, nil
-}
+func CopyXYZs(data XYZer) (XYZs, error) { _ = "STUB: not implemented"; return *new(XYZs), nil }
 
 // XYValues implements the XYer interface, returning
 // the x and y values from an XYZer.
 type XYValues struct{ XYZer }
 
 // XY implements the XY method of the XYer interface.
-func (xy XYValues) XY(i int) (float64, float64) {
-	x, y, _ := xy.XYZ(i)
-	return x, y
-}
+func (xy XYValues) XY(i int) (float64, float64) { _ = "STUB: not implemented"; return 0, 0 }
 
 // Labeller wraps the Label methods.
 type Labeller interface {
@@ -250,9 +194,7 @@ type Errors []struct{ Low, High float64 }
 // XErrors implements the XErrorer interface.
 type XErrors Errors
 
-func (xe XErrors) XError(i int) (float64, float64) {
-	return xe[i].Low, xe[i].High
-}
+func (xe XErrors) XError(i int) (float64, float64) { _ = "STUB: not implemented"; return 0, 0 }
 
 // YErrorer wraps the YError method.
 type YErrorer interface {
@@ -263,6 +205,4 @@ type YErrorer interface {
 // YErrors implements the YErrorer interface.
 type YErrors Errors
 
-func (ye YErrors) YError(i int) (float64, float64) {
-	return ye[i].Low, ye[i].High
-}
+func (ye YErrors) YError(i int) (float64, float64) { _ = "STUB: not implemented"; return 0, 0 }

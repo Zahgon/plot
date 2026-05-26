@@ -10,17 +10,11 @@
 package vgtex // import "gonum.org/v1/plot/vg/vgtex"
 
 import (
-	"bufio"
 	"bytes"
-	"fmt"
 	"image"
 	"image/color"
-	"image/png"
 	"io"
 	"math"
-	"os"
-	"strings"
-	"time"
 
 	"gonum.org/v1/plot/font"
 	"gonum.org/v1/plot/vg"
@@ -65,265 +59,86 @@ type context struct {
 }
 
 // New returns a new LaTeX canvas.
-func New(w, h vg.Length) *Canvas {
-	return newCanvas(w, h, false)
-}
+func New(w, h vg.Length) *Canvas { _ = "STUB: not implemented"; return nil }
 
 // NewDocument returns a new LaTeX canvas that can be readily
 // compiled into a standalone document.
-func NewDocument(w, h vg.Length) *Canvas {
-	return newCanvas(w, h, true)
-}
+func NewDocument(w, h vg.Length) *Canvas { _ = "STUB: not implemented"; return nil }
 
-func newCanvas(w, h vg.Length, document bool) *Canvas {
-	c := &Canvas{
-		buf:      new(bytes.Buffer),
-		w:        w,
-		h:        h,
-		document: document,
-		id:       time.Now().UnixNano(),
-	}
-	if !document {
-		c.wtex(`%%%% gonum/plot created for LaTeX/pgf`)
-		c.wtex(`%%%% you need to add:`)
-		c.wtex(`%%%%   \usepackage{pgf}`)
-		c.wtex(`%%%% to your LaTeX document`)
-	}
-	c.wtex("")
-	c.wtex(`\begin{pgfpicture}`)
-	c.stack = make([]context, 1)
-	vg.Initialize(c)
-	return c
-}
+func newCanvas(w, h vg.Length, document bool) *Canvas { _ = "STUB: not implemented"; return nil }
 
-func (c *Canvas) context() *context {
-	return &c.stack[len(c.stack)-1]
-}
+func (c *Canvas) context() *context { _ = "STUB: not implemented"; return nil }
 
 // Size returns the width and height of the canvas.
 func (c *Canvas) Size() (w, h vg.Length) {
-	return c.w, c.h
+	_ = "STUB: not implemented"
+
+	// SetLineWidth implements the vg.Canvas.SetLineWidth method.
+	return *new(vg.Length), *new(vg.Length)
 }
 
-// SetLineWidth implements the vg.Canvas.SetLineWidth method.
-func (c *Canvas) SetLineWidth(w vg.Length) {
-	c.context().linew = w
-}
+func (c *Canvas) SetLineWidth(w vg.Length) { _ = "STUB: not implemented"; return }
 
 // SetLineDash implements the vg.Canvas.SetLineDash method.
 func (c *Canvas) SetLineDash(pattern []vg.Length, offset vg.Length) {
-	c.context().dashArray = pattern
-	c.context().dashOffset = offset
+	_ = "STUB: not implemented"
+	return
 }
 
 // SetColor implements the vg.Canvas.SetColor method.
-func (c *Canvas) SetColor(clr color.Color) {
-	c.context().color = clr
-}
+func (c *Canvas) SetColor(clr color.Color) { _ = "STUB: not implemented"; return }
 
 // Rotate implements the vg.Canvas.Rotate method.
-func (c *Canvas) Rotate(rad float64) {
-	c.wtex(`\pgftransformrotate{%g}`, rad*degPerRadian)
-}
+func (c *Canvas) Rotate(rad float64) { _ = "STUB: not implemented"; return }
 
 // Translate implements the vg.Canvas.Translate method.
-func (c *Canvas) Translate(pt vg.Point) {
-	c.wtex(`\pgftransformshift{\pgfpoint{%gpt}{%gpt}}`, pt.X, pt.Y)
-}
+func (c *Canvas) Translate(pt vg.Point) { _ = "STUB: not implemented"; return }
 
 // Scale implements the vg.Canvas.Scale method.
-func (c *Canvas) Scale(x, y float64) {
-	c.wtex(`\pgftransformxscale{%g}`, x)
-	c.wtex(`\pgftransformyscale{%g}`, y)
-}
+func (c *Canvas) Scale(x, y float64) { _ = "STUB: not implemented"; return }
 
 // Push implements the vg.Canvas.Push method.
-func (c *Canvas) Push() {
-	c.wtex(`\begin{pgfscope}`)
-	c.stack = append(c.stack, *c.context())
-}
+func (c *Canvas) Push() { _ = "STUB: not implemented"; return }
 
 // Pop implements the vg.Canvas.Pop method.
-func (c *Canvas) Pop() {
-	c.stack = c.stack[:len(c.stack)-1]
-	c.wtex(`\end{pgfscope}`)
-	c.wtex("")
-}
+func (c *Canvas) Pop() { _ = "STUB: not implemented"; return }
 
 // Stroke implements the vg.Canvas.Stroke method.
-func (c *Canvas) Stroke(p vg.Path) {
-	if c.context().linew <= 0 {
-		return
-	}
-	c.Push()
-	c.wstyle()
-	c.wpath(p)
-	c.wtex(`\pgfusepath{stroke}`)
-	c.Pop()
-}
+func (c *Canvas) Stroke(p vg.Path) { _ = "STUB: not implemented"; return }
 
 // Fill implements the vg.Canvas.Fill method.
-func (c *Canvas) Fill(p vg.Path) {
-	c.Push()
-	c.wstyle()
-	c.wpath(p)
-	c.wtex(`\pgfusepath{fill}`)
-	c.Pop()
-}
+func (c *Canvas) Fill(p vg.Path) { _ = "STUB: not implemented"; return }
 
 // FillString implements the vg.Canvas.FillString method.
 func (c *Canvas) FillString(f font.Face, pt vg.Point, text string) {
-	c.Push()
-	c.wcolor()
-	pt.X += 0.5 * f.Width(text)
-	c.wtex(`\pgftext[base,at={\pgfpoint{%gpt}{%gpt}}]{{\fontsize{%gpt}{%gpt}\selectfont %s}}`, pt.X, pt.Y, f.Font.Size, f.Font.Size, text)
-	c.Pop()
+	_ = "STUB: not implemented"
+	return
 }
 
 // DrawImage implements the vg.Canvas.DrawImage method.
 // DrawImage will first save the image inside a PNG file and have the
 // generated LaTeX reference that file.
 // The file name will be "gonum-pgf-image-<canvas-id>-<time.Now()>.png
-func (c *Canvas) DrawImage(rect vg.Rectangle, img image.Image) {
-	fname := fmt.Sprintf("gonum-pgf-image-%v-%v.png", c.id, time.Now().UnixNano())
-	f, err := os.Create(fname)
-	if err != nil {
-		panic(err)
-	}
-	defer f.Close()
-	err = png.Encode(f, img)
-	if err != nil {
-		panic(fmt.Errorf("vgtex: error encoding image to PNG: %v", err))
-	}
+func (c *Canvas) DrawImage(rect vg.Rectangle, img image.Image) { _ = "STUB: not implemented"; return }
 
-	var (
-		xmin   = rect.Min.X
-		ymin   = rect.Min.Y
-		width  = rect.Size().X
-		height = rect.Size().Y
-	)
-	c.wtex(`\pgftext[base,left,at=\pgfpoint{%gpt}{%gpt}]{\pgfimage[height=%gpt,width=%gpt]{%s}}`, xmin, ymin, height, width, fname)
-}
+func (c *Canvas) indent(s string) string { _ = "STUB: not implemented"; return "" }
 
-func (c *Canvas) indent(s string) string {
-	return strings.Repeat(s, len(c.stack))
-}
+func (c *Canvas) wtex(s string, args ...any) { _ = "STUB: not implemented"; return }
 
-func (c *Canvas) wtex(s string, args ...any) {
-	fmt.Fprintf(c.buf, c.indent("  ")+s+"\n", args...)
-}
+func (c *Canvas) wstyle() { _ = "STUB: not implemented"; return }
 
-func (c *Canvas) wstyle() {
-	c.wdash()
-	c.wlineWidth()
-	c.wcolor()
-}
+func (c *Canvas) wdash() { _ = "STUB: not implemented"; return }
 
-func (c *Canvas) wdash() {
-	if len(c.context().dashArray) == 0 {
-		c.wtex(`\pgfsetdash{}{0pt}`)
-		return
-	}
-	str := `\pgfsetdash{`
-	for _, d := range c.context().dashArray {
-		str += fmt.Sprintf("{%gpt}", d)
-	}
-	str += fmt.Sprintf("}{%gpt}", c.context().dashOffset)
-	c.wtex(str)
-}
+func (c *Canvas) wlineWidth() { _ = "STUB: not implemented"; return }
 
-func (c *Canvas) wlineWidth() {
-	c.wtex(`\pgfsetlinewidth{%gpt}`, c.context().linew)
-}
+func (c *Canvas) wcolor() { _ = "STUB: not implemented"; return }
 
-func (c *Canvas) wcolor() {
-	col := c.context().color
-	if col == nil {
-		col = color.Black
-	}
-	r, g, b, a := col.RGBA()
-	// FIXME(sbinet) \color will last until the end of the current TeX group
-	// use \pgfsetcolor and \pgfsetstrokecolor instead.
-	// it needs a named color: define it on the fly (storing it at the beginning
-	// of the document.)
-	c.wtex(
-		`\color[rgb]{%g,%g,%g}`,
-		float64(r)/math.MaxUint16,
-		float64(g)/math.MaxUint16,
-		float64(b)/math.MaxUint16,
-	)
+// FIXME(sbinet) \color will last until the end of the current TeX group
+// use \pgfsetcolor and \pgfsetstrokecolor instead.
+// it needs a named color: define it on the fly (storing it at the beginning
+// of the document.)
 
-	opacity := float64(a) / math.MaxUint16
-	c.wtex(`\pgfsetstrokeopacity{%g}`, opacity)
-	c.wtex(`\pgfsetfillopacity{%g}`, opacity)
-}
-
-func (c *Canvas) wpath(p vg.Path) {
-	for _, comp := range p {
-		switch comp.Type {
-		case vg.MoveComp:
-			c.wtex(`\pgfpathmoveto{\pgfpoint{%gpt}{%gpt}}`, comp.Pos.X, comp.Pos.Y)
-		case vg.LineComp:
-			c.wtex(`\pgflineto{\pgfpoint{%gpt}{%gpt}}`, comp.Pos.X, comp.Pos.Y)
-		case vg.ArcComp:
-			start := comp.Start * degPerRadian
-			angle := comp.Angle * degPerRadian
-			r := comp.Radius
-			c.wtex(`\pgfpatharc{%g}{%g}{%gpt}`, start, angle, r)
-		case vg.CurveComp:
-			var a, b vg.Point
-			switch len(comp.Control) {
-			case 1:
-				a = comp.Control[0]
-				b = a
-			case 2:
-				a = comp.Control[0]
-				b = comp.Control[1]
-			default:
-				panic("vgtex: invalid number of control points")
-			}
-			c.wtex(`\pgfcurveto{\pgfpoint{%gpt}{%gpt}}{\pgfpoint{%gpt}{%gpt}}{\pgfpoint{%gpt}{%gpt}}`,
-				a.X, a.Y, b.X, b.Y, comp.Pos.X, comp.Pos.Y)
-		case vg.CloseComp:
-			c.wtex("%% path-close")
-		default:
-			panic(fmt.Errorf("vgtex: unknown path component type: %v", comp.Type))
-		}
-	}
-}
+func (c *Canvas) wpath(p vg.Path) { _ = "STUB: not implemented"; return }
 
 // WriteTo implements the io.WriterTo interface, writing a LaTeX/pgf plot.
-func (c *Canvas) WriteTo(w io.Writer) (int64, error) {
-	var (
-		n   int64
-		nn  int
-		err error
-	)
-	b := bufio.NewWriter(w)
-	if c.document {
-		nn, err = b.Write([]byte(defaultHeader))
-		n += int64(nn)
-		if err != nil {
-			return n, err
-		}
-	}
-	m, err := c.buf.WriteTo(b)
-	n += m
-	if err != nil {
-		return n, err
-	}
-	nn, err = fmt.Fprintf(b, "\\end{pgfpicture}\n")
-	n += int64(nn)
-	if err != nil {
-		return n, err
-	}
-
-	if c.document {
-		nn, err = b.Write([]byte(defaultFooter))
-		n += int64(nn)
-		if err != nil {
-			return n, err
-		}
-	}
-	return n, b.Flush()
-}
+func (c *Canvas) WriteTo(w io.Writer) (int64, error) { _ = "STUB: not implemented"; return 0, nil }

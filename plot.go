@@ -7,10 +7,6 @@ package plot
 import (
 	"image/color"
 	"io"
-	"math"
-	"os"
-	"path/filepath"
-	"strings"
 
 	"gonum.org/v1/plot/font"
 	"gonum.org/v1/plot/font/liberation"
@@ -93,24 +89,7 @@ const (
 )
 
 // New returns a new plot with some reasonable default settings.
-func New() *Plot {
-	hdlr := DefaultTextHandler
-	p := &Plot{
-		BackgroundColor: color.White,
-		X:               makeAxis(horizontal),
-		Y:               makeAxis(vertical),
-		Legend:          newLegend(hdlr),
-		TextHandler:     hdlr,
-	}
-	p.Title.TextStyle = text.Style{
-		Color:   color.Black,
-		Font:    font.From(DefaultFont, 12),
-		XAlign:  draw.XCenter,
-		YAlign:  draw.YTop,
-		Handler: hdlr,
-	}
-	return p
-}
+func New() *Plot { _ = "STUB: not implemented"; return nil }
 
 // Add adds a Plotters to the plot.
 //
@@ -121,19 +100,7 @@ func New() *Plot {
 //
 // When drawing the plot, Plotters are drawn in the
 // order in which they were added to the plot.
-func (p *Plot) Add(ps ...Plotter) {
-	for _, d := range ps {
-		if x, ok := d.(DataRanger); ok {
-			xmin, xmax, ymin, ymax := x.DataRange()
-			p.X.Min = math.Min(p.X.Min, xmin)
-			p.X.Max = math.Max(p.X.Max, xmax)
-			p.Y.Min = math.Min(p.Y.Min, ymin)
-			p.Y.Max = math.Max(p.Y.Max, ymax)
-		}
-	}
-
-	p.plotters = append(p.plotters, ps...)
-}
+func (p *Plot) Add(ps ...Plotter) { _ = "STUB: not implemented"; return }
 
 // Draw draws a plot to a draw.Canvas.
 //
@@ -142,226 +109,50 @@ func (p *Plot) Add(ps ...Plotter) {
 // GlyphBoxer interface will have their GlyphBoxes
 // taken into account when padding the plot so that
 // none of their glyphs are clipped.
-func (p *Plot) Draw(c draw.Canvas) {
-	if p.BackgroundColor != nil {
-		c.SetColor(p.BackgroundColor)
-		c.Fill(c.Rectangle.Path())
-	}
-
-	if p.Title.Text != "" {
-		descent := p.Title.TextStyle.FontExtents().Descent
-		c.FillText(p.Title.TextStyle, vg.Point{X: c.Center().X, Y: c.Max.Y + descent}, p.Title.Text)
-
-		rect := p.Title.TextStyle.Rectangle(p.Title.Text)
-		c.Max.Y -= rect.Size().Y
-		c.Max.Y -= p.Title.Padding
-	}
-
-	p.X.sanitizeRange()
-	x := horizontalAxis{p.X}
-	p.Y.sanitizeRange()
-	y := verticalAxis{p.Y}
-
-	ywidth := y.size()
-
-	xheight := x.size()
-	x.draw(padX(p, draw.Crop(c, ywidth, 0, 0, 0)))
-	y.draw(padY(p, draw.Crop(c, 0, 0, xheight, 0)))
-
-	dataC := padY(p, padX(p, draw.Crop(c, ywidth, 0, xheight, 0)))
-	for _, data := range p.plotters {
-		data.Plot(dataC, p)
-	}
-
-	p.Legend.Draw(draw.Crop(c, ywidth, 0, xheight, 0))
-}
+func (p *Plot) Draw(c draw.Canvas) { _ = "STUB: not implemented"; return }
 
 // DataCanvas returns a new draw.Canvas that
 // is the subset of the given draw area into which
 // the plot data will be drawn.
 func (p *Plot) DataCanvas(da draw.Canvas) draw.Canvas {
-	if p.Title.Text != "" {
-		rect := p.Title.TextStyle.Rectangle(p.Title.Text)
-		da.Max.Y -= rect.Size().Y
-		da.Max.Y -= p.Title.Padding
-	}
-	p.X.sanitizeRange()
-	x := horizontalAxis{p.X}
-	p.Y.sanitizeRange()
-	y := verticalAxis{p.Y}
-	return padY(p, padX(p, draw.Crop(da, y.size(), 0, x.size(), 0)))
+	_ = "STUB: not implemented"
+	return *new(draw.Canvas)
 }
 
 // DrawGlyphBoxes draws red outlines around the plot's
 // GlyphBoxes.  This is intended for debugging.
-func (p *Plot) DrawGlyphBoxes(c draw.Canvas) {
-	dac := p.DataCanvas(c)
-	sty := draw.LineStyle{
-		Color: color.RGBA{R: 255, A: 255},
-		Width: vg.Points(0.5),
-	}
-
-	drawBox := func(c draw.Canvas, b GlyphBox) {
-		x := c.X(b.X) + b.Rectangle.Min.X
-		y := c.Y(b.Y) + b.Rectangle.Min.Y
-		c.StrokeLines(sty, []vg.Point{
-			{X: x, Y: y},
-			{X: x + b.Rectangle.Size().X, Y: y},
-			{X: x + b.Rectangle.Size().X, Y: y + b.Rectangle.Size().Y},
-			{X: x, Y: y + b.Rectangle.Size().Y},
-			{X: x, Y: y},
-		})
-	}
-
-	var title vg.Length
-	if p.Title.Text != "" {
-		rect := p.Title.TextStyle.Rectangle(p.Title.Text)
-		title += rect.Size().Y
-		title += p.Title.Padding
-		box := GlyphBox{
-			Rectangle: rect.Add(vg.Point{
-				X: c.Center().X,
-				Y: c.Max.Y,
-			}),
-		}
-		drawBox(c, box)
-	}
-
-	for _, b := range p.GlyphBoxes(p) {
-		drawBox(dac, b)
-	}
-
-	p.X.sanitizeRange()
-	p.Y.sanitizeRange()
-
-	x := horizontalAxis{p.X}
-	y := verticalAxis{p.Y}
-
-	ywidth := y.size()
-	xheight := x.size()
-
-	cx := padX(p, draw.Crop(c, ywidth, 0, 0, 0))
-	for _, b := range x.GlyphBoxes(p) {
-		drawBox(cx, b)
-	}
-
-	cy := padY(p, draw.Crop(c, 0, 0, xheight, 0))
-	cy.Max.Y -= title
-	for _, b := range y.GlyphBoxes(p) {
-		drawBox(cy, b)
-	}
-}
+func (p *Plot) DrawGlyphBoxes(c draw.Canvas) { _ = "STUB: not implemented"; return }
 
 // padX returns a draw.Canvas that is padded horizontally
 // so that glyphs will no be clipped.
-func padX(p *Plot, c draw.Canvas) draw.Canvas {
-	glyphs := p.GlyphBoxes(p)
-	l := leftMost(&c, glyphs)
-	xAxis := horizontalAxis{p.X}
-	glyphs = append(glyphs, xAxis.GlyphBoxes(p)...)
-	r := rightMost(&c, glyphs)
-
-	minx := c.Min.X - l.Min.X
-	maxx := c.Max.X - (r.Min.X + r.Size().X)
-	lx := vg.Length(l.X)
-	rx := vg.Length(r.X)
-	n := (lx*maxx - rx*minx) / (lx - rx)
-	m := ((lx-1)*maxx - rx*minx + minx) / (lx - rx)
-	return draw.Canvas{
-		Canvas: vg.Canvas(c),
-		Rectangle: vg.Rectangle{
-			Min: vg.Point{X: n, Y: c.Min.Y},
-			Max: vg.Point{X: m, Y: c.Max.Y},
-		},
-	}
-}
+func padX(p *Plot, c draw.Canvas) draw.Canvas { _ = "STUB: not implemented"; return *new(draw.Canvas) }
 
 // rightMost returns the right-most GlyphBox.
 func rightMost(c *draw.Canvas, boxes []GlyphBox) GlyphBox {
-	maxx := c.Max.X
-	r := GlyphBox{X: 1}
-	for _, b := range boxes {
-		if b.Size().X <= 0 {
-			continue
-		}
-		if x := c.X(b.X) + b.Min.X + b.Size().X; x > maxx && b.X <= 1 {
-			maxx = x
-			r = b
-		}
-	}
-	return r
+	_ = "STUB: not implemented"
+	return *new(GlyphBox)
 }
 
 // leftMost returns the left-most GlyphBox.
 func leftMost(c *draw.Canvas, boxes []GlyphBox) GlyphBox {
-	minx := c.Min.X
-	l := GlyphBox{}
-	for _, b := range boxes {
-		if b.Size().X <= 0 {
-			continue
-		}
-		if x := c.X(b.X) + b.Min.X; x < minx && b.X >= 0 {
-			minx = x
-			l = b
-		}
-	}
-	return l
+	_ = "STUB: not implemented"
+	return *new(GlyphBox)
 }
 
 // padY returns a draw.Canvas that is padded vertically
 // so that glyphs will no be clipped.
-func padY(p *Plot, c draw.Canvas) draw.Canvas {
-	glyphs := p.GlyphBoxes(p)
-	b := bottomMost(&c, glyphs)
-	yAxis := verticalAxis{p.Y}
-	glyphs = append(glyphs, yAxis.GlyphBoxes(p)...)
-	t := topMost(&c, glyphs)
-
-	miny := c.Min.Y - b.Min.Y
-	maxy := c.Max.Y - (t.Min.Y + t.Size().Y)
-	by := vg.Length(b.Y)
-	ty := vg.Length(t.Y)
-	n := (by*maxy - ty*miny) / (by - ty)
-	m := ((by-1)*maxy - ty*miny + miny) / (by - ty)
-	return draw.Canvas{
-		Canvas: vg.Canvas(c),
-		Rectangle: vg.Rectangle{
-			Min: vg.Point{Y: n, X: c.Min.X},
-			Max: vg.Point{Y: m, X: c.Max.X},
-		},
-	}
-}
+func padY(p *Plot, c draw.Canvas) draw.Canvas { _ = "STUB: not implemented"; return *new(draw.Canvas) }
 
 // topMost returns the top-most GlyphBox.
 func topMost(c *draw.Canvas, boxes []GlyphBox) GlyphBox {
-	maxy := c.Max.Y
-	t := GlyphBox{Y: 1}
-	for _, b := range boxes {
-		if b.Size().Y <= 0 {
-			continue
-		}
-		if y := c.Y(b.Y) + b.Min.Y + b.Size().Y; y > maxy && b.Y <= 1 {
-			maxy = y
-			t = b
-		}
-	}
-	return t
+	_ = "STUB: not implemented"
+	return *new(GlyphBox)
 }
 
 // bottomMost returns the bottom-most GlyphBox.
 func bottomMost(c *draw.Canvas, boxes []GlyphBox) GlyphBox {
-	miny := c.Min.Y
-	l := GlyphBox{}
-	for _, b := range boxes {
-		if b.Size().Y <= 0 {
-			continue
-		}
-		if y := c.Y(b.Y) + b.Min.Y; y < miny && b.Y >= 0 {
-			miny = y
-			l = b
-		}
-	}
-	return l
+	_ = "STUB: not implemented"
+	return *new(GlyphBox)
 }
 
 // Transforms returns functions to transfrom
@@ -369,9 +160,8 @@ func bottomMost(c *draw.Canvas, boxes []GlyphBox) GlyphBox {
 // the draw coordinate system of the given
 // draw area.
 func (p *Plot) Transforms(c *draw.Canvas) (x, y func(float64) vg.Length) {
-	x = func(x float64) vg.Length { return c.X(p.X.Norm(x)) }
-	y = func(y float64) vg.Length { return c.Y(p.Y.Norm(y)) }
-	return
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // GlyphBoxer wraps the GlyphBoxes method.
@@ -418,24 +208,7 @@ type GlyphBox struct {
 
 // GlyphBoxes returns the GlyphBoxes for all plot
 // data that meet the GlyphBoxer interface.
-func (p *Plot) GlyphBoxes(*Plot) (boxes []GlyphBox) {
-	for _, d := range p.plotters {
-		gb, ok := d.(GlyphBoxer)
-		if !ok {
-			continue
-		}
-		for _, b := range gb.GlyphBoxes(p) {
-			if b.Size().X > 0 && (b.X < 0 || b.X > 1) {
-				continue
-			}
-			if b.Size().Y > 0 && (b.Y < 0 || b.Y > 1) {
-				continue
-			}
-			boxes = append(boxes, b)
-		}
-	}
-	return
-}
+func (p *Plot) GlyphBoxes(*Plot) (boxes []GlyphBox) { _ = "STUB: not implemented"; return nil }
 
 // NominalX configures the plot to have a nominal X
 // axis—an X axis with names instead of numbers.  The
@@ -444,50 +217,19 @@ func (p *Plot) GlyphBoxes(*Plot) (boxes []GlyphBox) {
 // 1 is above the second name, etc.  Labels for x values
 // that do not end up in range of the X axis will not have
 // tick marks.
-func (p *Plot) NominalX(names ...string) {
-	p.X.Tick.Width = 0
-	p.X.Tick.Length = 0
-	p.X.Width = 0
-	p.Y.Padding = p.X.Tick.Label.Width(names[0]) / 2
-	ticks := make([]Tick, len(names))
-	for i, name := range names {
-		ticks[i] = Tick{float64(i), name}
-	}
-	p.X.Tick.Marker = ConstantTicks(ticks)
-}
+func (p *Plot) NominalX(names ...string) { _ = "STUB: not implemented"; return }
 
 // HideX configures the X axis so that it will not be drawn.
-func (p *Plot) HideX() {
-	p.X.Tick.Length = 0
-	p.X.Width = 0
-	p.X.Tick.Marker = ConstantTicks([]Tick{})
-}
+func (p *Plot) HideX() { _ = "STUB: not implemented"; return }
 
 // HideY configures the Y axis so that it will not be drawn.
-func (p *Plot) HideY() {
-	p.Y.Tick.Length = 0
-	p.Y.Width = 0
-	p.Y.Tick.Marker = ConstantTicks([]Tick{})
-}
+func (p *Plot) HideY() { _ = "STUB: not implemented"; return }
 
 // HideAxes hides the X and Y axes.
-func (p *Plot) HideAxes() {
-	p.HideX()
-	p.HideY()
-}
+func (p *Plot) HideAxes() { _ = "STUB: not implemented"; return }
 
 // NominalY is like NominalX, but for the Y axis.
-func (p *Plot) NominalY(names ...string) {
-	p.Y.Tick.Width = 0
-	p.Y.Tick.Length = 0
-	p.Y.Width = 0
-	p.X.Padding = p.Y.Tick.Label.Height(names[0]) / 2
-	ticks := make([]Tick, len(names))
-	for i, name := range names {
-		ticks[i] = Tick{float64(i), name}
-	}
-	p.Y.Tick.Marker = ConstantTicks(ticks)
-}
+func (p *Plot) NominalY(names ...string) { _ = "STUB: not implemented"; return }
 
 // WriterTo returns an io.WriterTo that will write the plot as
 // the specified image format.
@@ -502,12 +244,8 @@ func (p *Plot) NominalY(names ...string) {
 //   - .tex
 //   - .tif|.tiff
 func (p *Plot) WriterTo(w, h vg.Length, format string) (io.WriterTo, error) {
-	c, err := draw.NewFormattedCanvas(w, h, format)
-	if err != nil {
-		return nil, err
-	}
-	p.Draw(draw.New(c))
-	return c, nil
+	_ = "STUB: not implemented"
+	return *new(io.WriterTo), nil
 }
 
 // Save saves the plot to an image file.  The file format is determined
@@ -522,30 +260,7 @@ func (p *Plot) WriterTo(w, h vg.Length, format string) (io.WriterTo, error) {
 //   - .svg
 //   - .tex
 //   - .tif|.tiff
-func (p *Plot) Save(w, h vg.Length, file string) (err error) {
-	f, err := os.Create(file)
-	if err != nil {
-		return err
-	}
-	defer func() {
-		e := f.Close()
-		if err == nil {
-			err = e
-		}
-	}()
-
-	format := strings.ToLower(filepath.Ext(file))
-	if len(format) != 0 {
-		format = format[1:]
-	}
-	c, err := p.WriterTo(w, h, format)
-	if err != nil {
-		return err
-	}
-
-	_, err = c.WriteTo(f)
-	return err
-}
+func (p *Plot) Save(w, h vg.Length, file string) (err error) { _ = "STUB: not implemented"; return nil }
 
 func init() {
 	font.DefaultCache.Add(liberation.Collection())

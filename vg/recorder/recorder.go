@@ -6,17 +6,10 @@
 package recorder // import "gonum.org/v1/plot/vg/recorder"
 
 import (
-	"bytes"
-	"encoding/base64"
-	"fmt"
 	"image"
 	"image/color"
-	"image/png"
-	"runtime"
-	"slices"
 
 	"gonum.org/v1/plot/font"
-	"gonum.org/v1/plot/font/liberation"
 	"gonum.org/v1/plot/vg"
 )
 
@@ -58,61 +51,18 @@ type callerLocation struct {
 	line       int
 }
 
-func (l *callerLocation) set() {
-	_, l.file, l.line, l.haveCaller = runtime.Caller(3)
-}
+func (l *callerLocation) set() { _ = "STUB: not implemented"; return }
 
-func (l callerLocation) String() string {
-	if !l.haveCaller {
-		return ""
-	}
-	return fmt.Sprintf("%s:%d ", l.file, l.line)
-}
+func (l callerLocation) String() string { _ = "STUB: not implemented"; return "" }
 
 // Reset resets the Canvas to the base state.
-func (c *Canvas) Reset() {
-	c.Actions = c.Actions[:0]
-}
+func (c *Canvas) Reset() { _ = "STUB: not implemented"; return }
 
 // ReplayOn applies the set of Actions recorded by the Canvas onto
 // the destination Canvas.
-func (c *Canvas) ReplayOn(dst vg.Canvas) error {
-	if c.fonts == nil {
-		c.fonts = make(map[fontID]font.Face)
-	}
-	if c.cache == nil {
-		c.cache = font.NewCache(liberation.Collection())
-	}
-	for _, a := range c.Actions {
-		fa, ok := a.(*FillString)
-		if !ok {
-			continue
-		}
-		f := fontID{name: fa.Font.Name(), size: fa.Size}
-		if _, exists := c.fonts[f]; !exists {
-			if !c.cache.Has(fa.Font) {
-				return fmt.Errorf("unknown font: %s", fa.Font.Typeface)
-			}
-			face := c.cache.Lookup(
-				fa.Font,
-				fa.Size,
-			)
-			c.fonts[f] = face
-		}
-		fa.fonts = c.fonts
-	}
-	for _, a := range c.Actions {
-		a.ApplyTo(dst)
-	}
-	return nil
-}
+func (c *Canvas) ReplayOn(dst vg.Canvas) error { _ = "STUB: not implemented"; return nil }
 
-func (c *Canvas) append(a Action) {
-	if c.KeepCaller {
-		a.callerLocation().set()
-	}
-	c.Actions = append(c.Actions, a)
-}
+func (c *Canvas) append(a Action) { _ = "STUB: not implemented"; return }
 
 // SetLineWidth corresponds to the vg.Canvas.SetWidth method.
 type SetLineWidth struct {
@@ -122,25 +72,21 @@ type SetLineWidth struct {
 }
 
 // SetLineWidth implements the SetLineWidth method of the vg.Canvas interface.
-func (c *Canvas) SetLineWidth(w vg.Length) {
-	c.append(&SetLineWidth{Width: w})
-}
+func (c *Canvas) SetLineWidth(w vg.Length) { _ = "STUB: not implemented"; return }
 
 // Call returns the method call that generated the action.
-func (a *SetLineWidth) Call() string {
-	return fmt.Sprintf("%sSetLineWidth(%v)", a.l, a.Width)
-}
+func (a *SetLineWidth) Call() string { _ = "STUB: not implemented"; return "" }
 
 // ApplyTo applies the action to the given vg.Canvas.
-func (a *SetLineWidth) ApplyTo(c vg.Canvas) {
-	c.SetLineWidth(a.Width)
-}
+func (a *SetLineWidth) ApplyTo(c vg.Canvas) { _ = "STUB: not implemented"; return }
 
 func (a *SetLineWidth) callerLocation() *callerLocation {
-	return &a.l
+	_ = "STUB: not implemented"
+
+	// SetLineDash corresponds to the vg.Canvas.SetLineDash method.
+	return nil
 }
 
-// SetLineDash corresponds to the vg.Canvas.SetLineDash method.
 type SetLineDash struct {
 	Dashes  []vg.Length
 	Offsets vg.Length
@@ -149,28 +95,21 @@ type SetLineDash struct {
 }
 
 // SetLineDash implements the SetLineDash method of the vg.Canvas interface.
-func (c *Canvas) SetLineDash(dashes []vg.Length, offs vg.Length) {
-	c.append(&SetLineDash{
-		Dashes:  slices.Clone(dashes),
-		Offsets: offs,
-	})
-}
+func (c *Canvas) SetLineDash(dashes []vg.Length, offs vg.Length) { _ = "STUB: not implemented"; return }
 
 // Call returns the method call that generated the action.
-func (a *SetLineDash) Call() string {
-	return fmt.Sprintf("%sSetLineDash(%#v, %v)", a.l, a.Dashes, a.Offsets)
-}
+func (a *SetLineDash) Call() string { _ = "STUB: not implemented"; return "" }
 
 // ApplyTo applies the action to the given vg.Canvas.
-func (a *SetLineDash) ApplyTo(c vg.Canvas) {
-	c.SetLineDash(a.Dashes, a.Offsets)
-}
+func (a *SetLineDash) ApplyTo(c vg.Canvas) { _ = "STUB: not implemented"; return }
 
 func (a *SetLineDash) callerLocation() *callerLocation {
-	return &a.l
+	_ = "STUB: not implemented"
+
+	// SetColor corresponds to the vg.Canvas.SetColor method.
+	return nil
 }
 
-// SetColor corresponds to the vg.Canvas.SetColor method.
 type SetColor struct {
 	Color color.Color
 
@@ -178,25 +117,21 @@ type SetColor struct {
 }
 
 // SetColor implements the SetColor method of the vg.Canvas interface.
-func (c *Canvas) SetColor(col color.Color) {
-	c.append(&SetColor{Color: col})
-}
+func (c *Canvas) SetColor(col color.Color) { _ = "STUB: not implemented"; return }
 
 // Call returns the method call that generated the action.
-func (a *SetColor) Call() string {
-	return fmt.Sprintf("%sSetColor(%#v)", a.l, a.Color)
-}
+func (a *SetColor) Call() string { _ = "STUB: not implemented"; return "" }
 
 // ApplyTo applies the action to the given vg.Canvas.
-func (a *SetColor) ApplyTo(c vg.Canvas) {
-	c.SetColor(a.Color)
-}
+func (a *SetColor) ApplyTo(c vg.Canvas) { _ = "STUB: not implemented"; return }
 
 func (a *SetColor) callerLocation() *callerLocation {
-	return &a.l
+	_ = "STUB: not implemented"
+
+	// Rotate corresponds to the vg.Canvas.Rotate method.
+	return nil
 }
 
-// Rotate corresponds to the vg.Canvas.Rotate method.
 type Rotate struct {
 	Angle float64
 
@@ -204,25 +139,21 @@ type Rotate struct {
 }
 
 // Rotate implements the Rotate method of the vg.Canvas interface.
-func (c *Canvas) Rotate(a float64) {
-	c.append(&Rotate{Angle: a})
-}
+func (c *Canvas) Rotate(a float64) { _ = "STUB: not implemented"; return }
 
 // Call returns the method call that generated the action.
-func (a *Rotate) Call() string {
-	return fmt.Sprintf("%sRotate(%v)", a.l, a.Angle)
-}
+func (a *Rotate) Call() string { _ = "STUB: not implemented"; return "" }
 
 // ApplyTo applies the action to the given vg.Canvas.
-func (a *Rotate) ApplyTo(c vg.Canvas) {
-	c.Rotate(a.Angle)
-}
+func (a *Rotate) ApplyTo(c vg.Canvas) { _ = "STUB: not implemented"; return }
 
 func (a *Rotate) callerLocation() *callerLocation {
-	return &a.l
+	_ = "STUB: not implemented"
+
+	// Translate corresponds to the vg.Canvas.Translate method.
+	return nil
 }
 
-// Translate corresponds to the vg.Canvas.Translate method.
 type Translate struct {
 	Point vg.Point
 
@@ -230,25 +161,21 @@ type Translate struct {
 }
 
 // Translate implements the Translate method of the vg.Canvas interface.
-func (c *Canvas) Translate(pt vg.Point) {
-	c.append(&Translate{Point: pt})
-}
+func (c *Canvas) Translate(pt vg.Point) { _ = "STUB: not implemented"; return }
 
 // Call returns the method call that generated the action.
-func (a *Translate) Call() string {
-	return fmt.Sprintf("%sTranslate(%v, %v)", a.l, a.Point.X, a.Point.Y)
-}
+func (a *Translate) Call() string { _ = "STUB: not implemented"; return "" }
 
 // ApplyTo applies the action to the given vg.Canvas.
-func (a *Translate) ApplyTo(c vg.Canvas) {
-	c.Translate(a.Point)
-}
+func (a *Translate) ApplyTo(c vg.Canvas) { _ = "STUB: not implemented"; return }
 
 func (a *Translate) callerLocation() *callerLocation {
-	return &a.l
+	_ = "STUB: not implemented"
+
+	// Scale corresponds to the vg.Canvas.Scale method.
+	return nil
 }
 
-// Scale corresponds to the vg.Canvas.Scale method.
 type Scale struct {
 	X, Y float64
 
@@ -256,73 +183,69 @@ type Scale struct {
 }
 
 // Scale implements the Scale method of the vg.Canvas interface.
-func (c *Canvas) Scale(x, y float64) {
-	c.append(&Scale{X: x, Y: y})
-}
+func (c *Canvas) Scale(x, y float64) { _ = "STUB: not implemented"; return }
 
 // Call returns the method call that generated the action.
-func (a *Scale) Call() string {
-	return fmt.Sprintf("%sScale(%v, %v)", a.l, a.X, a.Y)
-}
+func (a *Scale) Call() string { _ = "STUB: not implemented"; return "" }
 
 // ApplyTo applies the action to the given vg.Canvas.
-func (a *Scale) ApplyTo(c vg.Canvas) {
-	c.Scale(a.X, a.Y)
-}
+func (a *Scale) ApplyTo(c vg.Canvas) { _ = "STUB: not implemented"; return }
 
 func (a *Scale) callerLocation() *callerLocation {
-	return &a.l
+	_ = "STUB: not implemented"
+
+	// Push corresponds to the vg.Canvas.Push method.
+	return nil
 }
 
-// Push corresponds to the vg.Canvas.Push method.
 type Push struct {
 	l callerLocation
 }
 
 // Push implements the Push method of the vg.Canvas interface.
 func (c *Canvas) Push() {
-	c.append(&Push{})
+	_ = "STUB: not implemented"
+
+	// Call returns the method call that generated the action.
+	return
 }
 
-// Call returns the method call that generated the action.
-func (a *Push) Call() string {
-	return fmt.Sprintf("%sPush()", a.l)
-}
+func (a *Push) Call() string { _ = "STUB: not implemented"; return "" }
 
 // ApplyTo applies the action to the given vg.Canvas.
-func (a *Push) ApplyTo(c vg.Canvas) {
-	c.Push()
-}
+func (a *Push) ApplyTo(c vg.Canvas) { _ = "STUB: not implemented"; return }
 
 func (a *Push) callerLocation() *callerLocation {
-	return &a.l
+	_ = "STUB: not implemented"
+
+	// Pop corresponds to the vg.Canvas.Pop method.
+	return nil
 }
 
-// Pop corresponds to the vg.Canvas.Pop method.
 type Pop struct {
 	l callerLocation
 }
 
 // Pop implements the Pop method of the vg.Canvas interface.
 func (c *Canvas) Pop() {
-	c.append(&Pop{})
+	_ = "STUB: not implemented"
+
+	// Call returns the method call that generated the action.
+	return
 }
 
-// Call returns the method call that generated the action.
-func (a *Pop) Call() string {
-	return fmt.Sprintf("%sPop()", a.l)
-}
+func (a *Pop) Call() string { _ = "STUB: not implemented"; return "" }
 
 // ApplyTo applies the action to the given vg.Canvas.
-func (a *Pop) ApplyTo(c vg.Canvas) {
-	c.Pop()
-}
+func (a *Pop) ApplyTo(c vg.Canvas) { _ = "STUB: not implemented"; return }
 
 func (a *Pop) callerLocation() *callerLocation {
-	return &a.l
+	_ = "STUB: not implemented"
+
+	// Stroke corresponds to the vg.Canvas.Stroke method.
+	return nil
 }
 
-// Stroke corresponds to the vg.Canvas.Stroke method.
 type Stroke struct {
 	Path vg.Path
 
@@ -330,25 +253,21 @@ type Stroke struct {
 }
 
 // Stroke implements the Stroke method of the vg.Canvas interface.
-func (c *Canvas) Stroke(path vg.Path) {
-	c.append(&Stroke{Path: slices.Clone(path)})
-}
+func (c *Canvas) Stroke(path vg.Path) { _ = "STUB: not implemented"; return }
 
 // Call returns the method call that generated the action.
-func (a *Stroke) Call() string {
-	return fmt.Sprintf("%sStroke(%#v)", a.l, a.Path)
-}
+func (a *Stroke) Call() string { _ = "STUB: not implemented"; return "" }
 
 // ApplyTo applies the action to the given vg.Canvas.
-func (a *Stroke) ApplyTo(c vg.Canvas) {
-	c.Stroke(a.Path)
-}
+func (a *Stroke) ApplyTo(c vg.Canvas) { _ = "STUB: not implemented"; return }
 
 func (a *Stroke) callerLocation() *callerLocation {
-	return &a.l
+	_ = "STUB: not implemented"
+
+	// Fill corresponds to the vg.Canvas.Fill method.
+	return nil
 }
 
-// Fill corresponds to the vg.Canvas.Fill method.
 type Fill struct {
 	Path vg.Path
 
@@ -356,25 +275,21 @@ type Fill struct {
 }
 
 // Fill implements the Fill method of the vg.Canvas interface.
-func (c *Canvas) Fill(path vg.Path) {
-	c.append(&Fill{Path: slices.Clone(path)})
-}
+func (c *Canvas) Fill(path vg.Path) { _ = "STUB: not implemented"; return }
 
 // Call returns the method call that generated the action.
-func (a *Fill) Call() string {
-	return fmt.Sprintf("%sFill(%#v)", a.l, a.Path)
-}
+func (a *Fill) Call() string { _ = "STUB: not implemented"; return "" }
 
 // ApplyTo applies the action to the given vg.Canvas.
-func (a *Fill) ApplyTo(c vg.Canvas) {
-	c.Fill(a.Path)
-}
+func (a *Fill) ApplyTo(c vg.Canvas) { _ = "STUB: not implemented"; return }
 
 func (a *Fill) callerLocation() *callerLocation {
-	return &a.l
+	_ = "STUB: not implemented"
+
+	// FillString corresponds to the vg.Canvas.FillString method.
+	return nil
 }
 
-// FillString corresponds to the vg.Canvas.FillString method.
 type FillString struct {
 	Font   font.Font
 	Size   vg.Length
@@ -388,29 +303,23 @@ type FillString struct {
 
 // FillString implements the FillString method of the vg.Canvas interface.
 func (c *Canvas) FillString(font font.Face, pt vg.Point, str string) {
-	c.append(&FillString{
-		Font:   font.Font,
-		Size:   font.Font.Size,
-		Point:  pt,
-		String: str,
-	})
+	_ = "STUB: not implemented"
+	return
 }
 
 // ApplyTo applies the action to the given vg.Canvas.
-func (a *FillString) ApplyTo(c vg.Canvas) {
-	c.FillString(a.fonts[fontID{name: a.Font.Name(), size: a.Size}], a.Point, a.String)
-}
+func (a *FillString) ApplyTo(c vg.Canvas) { _ = "STUB: not implemented"; return }
 
 // Call returns the pseudo method call that generated the action.
-func (a *FillString) Call() string {
-	return fmt.Sprintf("%sFillString(%q, %v, %v, %v, %q)", a.l, a.Font.Name(), a.Size, a.Point.X, a.Point.Y, a.String)
-}
+func (a *FillString) Call() string { _ = "STUB: not implemented"; return "" }
 
 func (a *FillString) callerLocation() *callerLocation {
-	return &a.l
+	_ = "STUB: not implemented"
+
+	// DrawImage corresponds to the vg.Canvas.DrawImage method
+	return nil
 }
 
-// DrawImage corresponds to the vg.Canvas.DrawImage method
 type DrawImage struct {
 	Rectangle vg.Rectangle
 	Image     image.Image
@@ -419,34 +328,21 @@ type DrawImage struct {
 }
 
 // DrawImage implements the DrawImage method of the vg.Canvas interface.
-func (c *Canvas) DrawImage(rect vg.Rectangle, img image.Image) {
-	c.append(&DrawImage{
-		Rectangle: rect,
-		Image:     img,
-	})
-}
+func (c *Canvas) DrawImage(rect vg.Rectangle, img image.Image) { _ = "STUB: not implemented"; return }
 
 // ApplyTo applies the action to the given vg.Canvas.
-func (a *DrawImage) ApplyTo(c vg.Canvas) {
-	c.DrawImage(a.Rectangle, a.Image)
-}
+func (a *DrawImage) ApplyTo(c vg.Canvas) { _ = "STUB: not implemented"; return }
 
 // Call returns the pseudo method call that generated the action.
-func (a *DrawImage) Call() string {
-	var buf bytes.Buffer
-	err := png.Encode(&buf, a.Image)
-	if err != nil {
-		panic(fmt.Errorf("recorder: error encoding image to PNG: %v", err))
-	}
-	b64 := base64.StdEncoding.EncodeToString(buf.Bytes())
-	return fmt.Sprintf("%sDrawImage(%#v, {%#v, IMAGE:%s})", a.l, a.Rectangle, a.Image.Bounds(), b64)
-}
+func (a *DrawImage) Call() string { _ = "STUB: not implemented"; return "" }
 
 func (a *DrawImage) callerLocation() *callerLocation {
-	return &a.l
+	_ = "STUB: not implemented"
+
+	// Commenter defines types that can record comments.
+	return nil
 }
 
-// Commenter defines types that can record comments.
 type Commenter interface {
 	Comment(string)
 }
@@ -461,22 +357,12 @@ type Comment struct {
 }
 
 // Comment adds a comment to a list of Actions..
-func (c *Canvas) Comment(text string) {
-	c.append(&Comment{Text: text})
-}
+func (c *Canvas) Comment(text string) { _ = "STUB: not implemented"; return }
 
 // Call returns the method call that generated the action.
-func (a *Comment) Call() string {
-	return fmt.Sprintf("%sComment(%q)", a.l, a.Text)
-}
+func (a *Comment) Call() string { _ = "STUB: not implemented"; return "" }
 
 // ApplyTo applies the action to the given vg.Canvas.
-func (a *Comment) ApplyTo(c vg.Canvas) {
-	if c, ok := c.(Commenter); ok {
-		c.Comment(a.Text)
-	}
-}
+func (a *Comment) ApplyTo(c vg.Canvas) { _ = "STUB: not implemented"; return }
 
-func (a *Comment) callerLocation() *callerLocation {
-	return &a.l
-}
+func (a *Comment) callerLocation() *callerLocation { _ = "STUB: not implemented"; return nil }

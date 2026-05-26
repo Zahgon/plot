@@ -6,7 +6,6 @@ package plotter
 
 import (
 	"gonum.org/v1/plot"
-	"gonum.org/v1/plot/vg"
 	"gonum.org/v1/plot/vg/draw"
 )
 
@@ -26,38 +25,13 @@ type Function struct {
 
 // NewFunction returns a Function that plots F using
 // the default line style with 50 samples.
-func NewFunction(f func(float64) float64) *Function {
-	return &Function{
-		F:         f,
-		Samples:   50,
-		LineStyle: DefaultLineStyle,
-	}
-}
+func NewFunction(f func(float64) float64) *Function { _ = "STUB: not implemented"; return nil }
 
 // Plot implements the Plotter interface, drawing a line
 // that connects each point in the Line.
-func (f *Function) Plot(c draw.Canvas, p *plot.Plot) {
-	trX, trY := p.Transforms(&c)
-
-	min, max := f.XMin, f.XMax
-	if min == 0 && max == 0 {
-		min = p.X.Min
-		max = p.X.Max
-	}
-	d := (max - min) / float64(f.Samples-1)
-	line := make([]vg.Point, f.Samples)
-	for i := range line {
-		x := min + float64(i)*d
-		line[i].X = trX(x)
-		line[i].Y = trY(f.F(x))
-	}
-	c.StrokeLines(f.LineStyle, c.ClipLinesXY(line)...)
-}
+func (f *Function) Plot(c draw.Canvas, p *plot.Plot) { _ = "STUB: not implemented"; return }
 
 // Thumbnail draws a line in the given style down the
 // center of a DrawArea as a thumbnail representation
 // of the LineStyle of the function.
-func (f Function) Thumbnail(c *draw.Canvas) {
-	y := c.Center().Y
-	c.StrokeLine2(f.LineStyle, c.Min.X, y, c.Max.X, y)
-}
+func (f Function) Thumbnail(c *draw.Canvas) { _ = "STUB: not implemented"; return }

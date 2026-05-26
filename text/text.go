@@ -6,7 +6,6 @@ package text
 
 import (
 	"image/color"
-	"math"
 
 	"gonum.org/v1/plot/font"
 	"gonum.org/v1/plot/vg"
@@ -94,107 +93,45 @@ type Style struct {
 }
 
 // FontExtents returns the extents of this Style's font.
-func (s Style) FontExtents() font.Extents {
-	return s.Handler.Extents(s.Font)
-}
+func (s Style) FontExtents() font.Extents { _ = "STUB: not implemented"; return *new(font.Extents) }
 
 // Width returns the width of lines of text
 // when using the given font before any text rotation is applied.
-func (s Style) Width(txt string) (max vg.Length) {
-	w, _ := s.box(txt)
-	return w
-}
+func (s Style) Width(txt string) (max vg.Length) { _ = "STUB: not implemented"; return *new(vg.Length) }
 
 // Height returns the height of the text when using
 // the given font before any text rotation is applied.
-func (s Style) Height(txt string) vg.Length {
-	_, h := s.box(txt)
-	return h
-}
+func (s Style) Height(txt string) vg.Length { _ = "STUB: not implemented"; return *new(vg.Length) }
 
 // box returns the bounding box of a possibly multi-line text.
 func (s Style) box(txt string) (w, h vg.Length) {
-	var (
-		lines   = s.Handler.Lines(txt)
-		e       = s.FontExtents()
-		linegap = (e.Height - e.Ascent - e.Descent)
-	)
-	for i, line := range lines {
-		ww, hh, dd := s.Handler.Box(line, s.Font)
-		if ww > w {
-			w = ww
-		}
-		h += hh + dd
-		if i > 0 {
-			h += linegap
-		}
-	}
-
-	return w, h
+	_ = "STUB: not implemented"
+	return *new(vg.Length), *new(vg.Length)
 }
 
 // Rectangle returns a rectangle giving the bounds of
 // this text assuming that it is drawn at (0, 0).
 func (s Style) Rectangle(txt string) vg.Rectangle {
-	e := s.Handler.Extents(s.Font)
-	w, h := s.box(txt)
-	desc := vg.Length(e.Height - e.Ascent) // descent + linegap
-	xoff := vg.Length(s.XAlign) * w
-	yoff := vg.Length(s.YAlign)*h - desc
-
-	// lower left corner
-	p1 := rotatePoint(s.Rotation, vg.Point{X: xoff, Y: yoff})
-	// upper left corner
-	p2 := rotatePoint(s.Rotation, vg.Point{X: xoff, Y: h + yoff})
-	// lower right corner
-	p3 := rotatePoint(s.Rotation, vg.Point{X: w + xoff, Y: yoff})
-	// upper right corner
-	p4 := rotatePoint(s.Rotation, vg.Point{X: w + xoff, Y: h + yoff})
-
-	return vg.Rectangle{
-		Max: vg.Point{
-			X: max(p1.X, p2.X, p3.X, p4.X),
-			Y: max(p1.Y, p2.Y, p3.Y, p4.Y),
-		},
-		Min: vg.Point{
-			X: min(p1.X, p2.X, p3.X, p4.X),
-			Y: min(p1.Y, p2.Y, p3.Y, p4.Y),
-		},
-	}
+	_ = "STUB: not implemented"
+	return *new(vg.Rectangle)
 }
+
+// descent + linegap
+
+// lower left corner
+
+// upper left corner
+
+// lower right corner
+
+// upper right corner
 
 // rotatePoint applies rotation theta (in radians) about the origin to point p.
 func rotatePoint(theta float64, p vg.Point) vg.Point {
-	if theta == 0 {
-		return p
-	}
-	x := float64(p.X)
-	y := float64(p.Y)
-
-	sin, cos := math.Sincos(theta)
-
-	return vg.Point{
-		X: vg.Length(x*cos - y*sin),
-		Y: vg.Length(y*cos + x*sin),
-	}
+	_ = "STUB: not implemented"
+	return *new(vg.Point)
 }
 
-func max(d ...vg.Length) vg.Length {
-	o := vg.Length(math.Inf(-1))
-	for _, dd := range d {
-		if dd > o {
-			o = dd
-		}
-	}
-	return o
-}
+func max(d ...vg.Length) vg.Length { _ = "STUB: not implemented"; return *new(vg.Length) }
 
-func min(d ...vg.Length) vg.Length {
-	o := vg.Length(math.Inf(1))
-	for _, dd := range d {
-		if dd < o {
-			o = dd
-		}
-	}
-	return o
-}
+func min(d ...vg.Length) vg.Length { _ = "STUB: not implemented"; return *new(vg.Length) }

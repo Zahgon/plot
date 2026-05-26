@@ -23,7 +23,6 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"strconv"
 	"strings"
 )
 
@@ -38,16 +37,7 @@ func init() {
 	flag.Parse()
 }
 
-func mustAtoi(f string) byte {
-	i, err := strconv.Atoi(f)
-	if err != nil {
-		panic(err)
-	}
-	if i < 0 || i > 0xff {
-		panic(fmt.Sprintf("byte out of range", i))
-	}
-	return byte(i)
-}
+func mustAtoi(f string) byte { _ = "STUB: not implemented"; return 0 }
 
 func main() {
 	fmt.Println(`// Apache-Style Software License for ColorBrewer software and ColorBrewer Color Schemes

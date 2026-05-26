@@ -67,89 +67,26 @@ type QuartPlot struct {
 // whiskers stretch) are the minimum and maximum
 // values that are not outside the fences.
 func NewQuartPlot(loc float64, values Valuer) (*QuartPlot, error) {
-	b := new(QuartPlot)
-	var err error
-	if b.fiveStatPlot, err = newFiveStat(0, loc, values); err != nil {
-		return nil, err
-	}
-
-	b.MedianStyle = DefaultQuartMedianStyle
-	b.WhiskerStyle = DefaultQuartWhiskerStyle
-
-	return b, err
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // Plot draws the QuartPlot on Canvas c and Plot plt.
-func (b *QuartPlot) Plot(c draw.Canvas, plt *plot.Plot) {
-	if b.Horizontal {
-		b := &horizQuartPlot{b}
-		b.Plot(c, plt)
-		return
-	}
-
-	trX, trY := plt.Transforms(&c)
-	x := trX(b.Location)
-	if !c.ContainsX(x) {
-		return
-	}
-	x += b.Offset
-
-	med := vg.Point{X: x, Y: trY(b.Median)}
-	q1 := trY(b.Quartile1)
-	q3 := trY(b.Quartile3)
-	aLow := trY(b.AdjLow)
-	aHigh := trY(b.AdjHigh)
-
-	c.StrokeLine2(b.WhiskerStyle, x, aHigh, x, q3)
-	if c.ContainsY(med.Y) {
-		c.DrawGlyphNoClip(b.MedianStyle, med)
-	}
-	c.StrokeLine2(b.WhiskerStyle, x, aLow, x, q1)
-
-	ostyle := b.MedianStyle
-	ostyle.Radius = b.MedianStyle.Radius / 2
-	for _, out := range b.Outside {
-		y := trY(b.Value(out))
-		if c.ContainsY(y) {
-			c.DrawGlyphNoClip(ostyle, vg.Point{X: x, Y: y})
-		}
-	}
-}
+func (b *QuartPlot) Plot(c draw.Canvas, plt *plot.Plot) { _ = "STUB: not implemented"; return }
 
 // DataRange returns the minimum and maximum x
 // and y values, implementing the plot.DataRanger
 // interface.
 func (b *QuartPlot) DataRange() (float64, float64, float64, float64) {
-	if b.Horizontal {
-		b := &horizQuartPlot{b}
-		return b.DataRange()
-	}
-	return b.Location, b.Location, b.Min, b.Max
+	_ = "STUB: not implemented"
+	return 0, 0, 0, 0
 }
 
 // GlyphBoxes returns a slice of GlyphBoxes for the plot,
 // implementing the plot.GlyphBoxer interface.
 func (b *QuartPlot) GlyphBoxes(plt *plot.Plot) []plot.GlyphBox {
-	if b.Horizontal {
-		b := &horizQuartPlot{b}
-		return b.GlyphBoxes(plt)
-	}
-
-	bs := make([]plot.GlyphBox, len(b.Outside)+1)
-
-	ostyle := b.MedianStyle
-	ostyle.Radius = b.MedianStyle.Radius / 2
-	for i, out := range b.Outside {
-		bs[i].X = plt.X.Norm(b.Location)
-		bs[i].Y = plt.Y.Norm(b.Value(out))
-		bs[i].Rectangle = ostyle.Rectangle()
-		bs[i].Rectangle.Min.X += b.Offset
-	}
-	bs[len(bs)-1].X = plt.X.Norm(b.Location)
-	bs[len(bs)-1].Y = plt.Y.Norm(b.Median)
-	bs[len(bs)-1].Rectangle = b.MedianStyle.Rectangle()
-	bs[len(bs)-1].Rectangle.Min.X += b.Offset
-	return bs
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // OutsideLabels returns a *Labels that will plot
@@ -157,22 +94,8 @@ func (b *QuartPlot) GlyphBoxes(plt *plot.Plot) []plot.GlyphBox {
 // labels are assumed to correspond to the
 // points used to create the plot.
 func (b *QuartPlot) OutsideLabels(labels Labeller) (*Labels, error) {
-	if b.Horizontal {
-		b := &horizQuartPlot{b}
-		return b.OutsideLabels(labels)
-	}
-	strs := make([]string, len(b.Outside))
-	for i, out := range b.Outside {
-		strs[i] = labels.Label(out)
-	}
-	o := quartPlotOutsideLabels{b, strs}
-	ls, err := NewLabels(o)
-	if err != nil {
-		return nil, err
-	}
-	off := 0.5 * b.MedianStyle.Radius
-	ls.Offset = ls.Offset.Add(vg.Point{X: off, Y: off})
-	return ls, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 type quartPlotOutsideLabels struct {
@@ -180,77 +103,38 @@ type quartPlotOutsideLabels struct {
 	labels []string
 }
 
-func (o quartPlotOutsideLabels) Len() int {
-	return len(o.qp.Outside)
-}
+func (o quartPlotOutsideLabels) Len() int { _ = "STUB: not implemented"; return 0 }
 
 func (o quartPlotOutsideLabels) XY(i int) (float64, float64) {
-	return o.qp.Location, o.qp.Value(o.qp.Outside[i])
+	_ = "STUB: not implemented"
+	return 0, 0
 }
 
 func (o quartPlotOutsideLabels) Label(i int) string {
-	return o.labels[i]
+	_ = "STUB: not implemented"
+
+	// horizQuartPlot is like a regular QuartPlot, however,
+	// it draws horizontally instead of Vertically.
+	return ""
 }
 
-// horizQuartPlot is like a regular QuartPlot, however,
-// it draws horizontally instead of Vertically.
 type horizQuartPlot struct{ *QuartPlot }
 
-func (b horizQuartPlot) Plot(c draw.Canvas, plt *plot.Plot) {
-	trX, trY := plt.Transforms(&c)
-	y := trY(b.Location)
-	if !c.ContainsY(y) {
-		return
-	}
-	y += b.Offset
-
-	med := vg.Point{X: trX(b.Median), Y: y}
-	q1 := trX(b.Quartile1)
-	q3 := trX(b.Quartile3)
-	aLow := trX(b.AdjLow)
-	aHigh := trX(b.AdjHigh)
-
-	c.StrokeLine2(b.WhiskerStyle, aHigh, y, q3, y)
-	if c.ContainsX(med.X) {
-		c.DrawGlyphNoClip(b.MedianStyle, med)
-	}
-	c.StrokeLine2(b.WhiskerStyle, aLow, y, q1, y)
-
-	ostyle := b.MedianStyle
-	ostyle.Radius = b.MedianStyle.Radius / 2
-	for _, out := range b.Outside {
-		x := trX(b.Value(out))
-		if c.ContainsX(x) {
-			c.DrawGlyphNoClip(ostyle, vg.Point{X: x, Y: y})
-		}
-	}
-}
+func (b horizQuartPlot) Plot(c draw.Canvas, plt *plot.Plot) { _ = "STUB: not implemented"; return }
 
 // DataRange returns the minimum and maximum x
 // and y values, implementing the plot.DataRanger
 // interface.
 func (b horizQuartPlot) DataRange() (float64, float64, float64, float64) {
-	return b.Min, b.Max, b.Location, b.Location
+	_ = "STUB: not implemented"
+	return 0, 0, 0, 0
 }
 
 // GlyphBoxes returns a slice of GlyphBoxes for the plot,
 // implementing the plot.GlyphBoxer interface.
 func (b horizQuartPlot) GlyphBoxes(plt *plot.Plot) []plot.GlyphBox {
-	bs := make([]plot.GlyphBox, len(b.Outside)+1)
-
-	ostyle := b.MedianStyle
-	ostyle.Radius = b.MedianStyle.Radius / 2
-	for i, out := range b.Outside {
-		bs[i].X = plt.X.Norm(b.Value(out))
-		bs[i].Y = plt.Y.Norm(b.Location)
-		bs[i].Rectangle = ostyle.Rectangle()
-		bs[i].Rectangle.Min.Y += b.Offset
-	}
-	bs[len(bs)-1].X = plt.X.Norm(b.Median)
-	bs[len(bs)-1].Y = plt.Y.Norm(b.Location)
-	bs[len(bs)-1].Rectangle = b.MedianStyle.Rectangle()
-	bs[len(bs)-1].Rectangle.Min.Y += b.Offset
-	return bs
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // OutsideLabels returns a *Labels that will plot
@@ -258,20 +142,8 @@ func (b horizQuartPlot) GlyphBoxes(plt *plot.Plot) []plot.GlyphBox {
 // labels are assumed to correspond to the
 // points used to create the plot.
 func (b *horizQuartPlot) OutsideLabels(labels Labeller) (*Labels, error) {
-	strs := make([]string, len(b.Outside))
-	for i, out := range b.Outside {
-		strs[i] = labels.Label(out)
-	}
-	o := horizQuartPlotOutsideLabels{
-		quartPlotOutsideLabels{b.QuartPlot, strs},
-	}
-	ls, err := NewLabels(o)
-	if err != nil {
-		return nil, err
-	}
-	off := 0.5 * b.MedianStyle.Radius
-	ls.Offset = ls.Offset.Add(vg.Point{X: off, Y: off})
-	return ls, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 type horizQuartPlotOutsideLabels struct {
@@ -279,5 +151,6 @@ type horizQuartPlotOutsideLabels struct {
 }
 
 func (o horizQuartPlotOutsideLabels) XY(i int) (float64, float64) {
-	return o.qp.Value(o.qp.Outside[i]), o.qp.Location
+	_ = "STUB: not implemented"
+	return 0, 0
 }

@@ -5,10 +5,7 @@
 package plotter
 
 import (
-	"image/color"
-
 	"gonum.org/v1/plot"
-	"gonum.org/v1/plot/vg"
 	"gonum.org/v1/plot/vg/draw"
 )
 
@@ -19,23 +16,6 @@ type GlyphBoxes struct {
 	draw.LineStyle
 }
 
-func NewGlyphBoxes() *GlyphBoxes {
-	g := new(GlyphBoxes)
-	g.Color = color.RGBA{R: 255, A: 255}
-	g.Width = vg.Points(0.25)
-	return g
-}
+func NewGlyphBoxes() *GlyphBoxes { _ = "STUB: not implemented"; return nil }
 
-func (g GlyphBoxes) Plot(c draw.Canvas, plt *plot.Plot) {
-	for _, b := range plt.GlyphBoxes(plt) {
-		x := c.X(b.X) + b.Rectangle.Min.X
-		y := c.Y(b.Y) + b.Rectangle.Min.Y
-		c.StrokeLines(g.LineStyle, []vg.Point{
-			{X: x, Y: y},
-			{X: x + b.Rectangle.Size().X, Y: y},
-			{X: x + b.Rectangle.Size().X, Y: y + b.Rectangle.Size().Y},
-			{X: x, Y: y + b.Rectangle.Size().Y},
-			{X: x, Y: y},
-		})
-	}
-}
+func (g GlyphBoxes) Plot(c draw.Canvas, plt *plot.Plot) { _ = "STUB: not implemented"; return }

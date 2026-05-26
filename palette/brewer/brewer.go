@@ -18,8 +18,6 @@
 package brewer // import "gonum.org/v1/plot/palette/brewer"
 
 import (
-	"errors"
-	"fmt"
 	"image/color"
 
 	"gonum.org/v1/plot/palette"
@@ -59,25 +57,30 @@ type Palette struct {
 type DivergingPalette Palette
 
 // Colors returns the palette's color collection.
-func (d DivergingPalette) Colors() []color.Color { return d.Color }
+func (d DivergingPalette) Colors() []color.Color {
+	_ = "STUB: not implemented"
 
-// CriticalIndex returns the indices of the lightest (median) color or colors in the DivergingPalette.
-// The low and high index values will be equal when there is a single median color.
-func (d DivergingPalette) CriticalIndex() (low, high int) {
-	l := len(d.Color)
-	return (l - 1) / 2, l / 2
+	// CriticalIndex returns the indices of the lightest (median) color or colors in the DivergingPalette.
+	// The low and high index values will be equal when there is a single median color.
+	return nil
 }
+
+func (d DivergingPalette) CriticalIndex() (low, high int) { _ = "STUB: not implemented"; return 0, 0 }
 
 // NonDivergingPalette represents sequential or qualitative color schemes.
 type NonDivergingPalette Palette
 
 // Colors returns the palette's color collection.
-func (d NonDivergingPalette) Colors() []color.Color { return d.Color }
+func (d NonDivergingPalette) Colors() []color.Color {
+	_ = "STUB: not implemented"
 
-// Diverging schemes put equal emphasis on mid-range critical values and extremes
-// at both ends of the data range. The critical class or break in the middle of the
-// legend is emphasized with light colors and low and high extremes are emphasized
-// with dark colors that have contrasting hues.
+	// Diverging schemes put equal emphasis on mid-range critical values and extremes
+	// at both ends of the data range. The critical class or break in the middle of the
+	// legend is emphasized with light colors and low and high extremes are emphasized
+	// with dark colors that have contrasting hues.
+	return nil
+}
+
 type Diverging map[int]DivergingPalette
 
 // Qualitative schemes do not imply magnitude differences between legend classes,
@@ -115,60 +118,6 @@ const (
 // required. An error is returned if the palette name or type is not known or the requested
 // palette does not support the required number of colors.
 func GetPalette(typ PaletteType, name string, colors int) (palette.Palette, error) {
-	if colors < 3 {
-		return nil, errors.New("brewer: number of colors must be 3 or greater")
-	}
-	var (
-		p palette.Palette
-
-		nameOk, colorsOk bool
-	)
-	switch typ {
-	case TypeAny:
-		var pt any
-		pt, nameOk = all[name]
-		if !nameOk {
-			break
-		}
-		switch pt := pt.(type) {
-		case Diverging:
-			p, colorsOk = pt[colors]
-		case Qualitative:
-			p, colorsOk = pt[colors]
-		case Sequential:
-			p, colorsOk = pt[colors]
-		default:
-			panic("brewer: unexpected type")
-		}
-	case TypeDiverging:
-		var pt Diverging
-		pt, nameOk = diverging[name]
-		if !nameOk {
-			break
-		}
-		p, colorsOk = pt[colors]
-	case TypeQualitative:
-		var pt Qualitative
-		pt, nameOk = qualitative[name]
-		if !nameOk {
-			break
-		}
-		p, colorsOk = pt[colors]
-	case TypeSequential:
-		var pt Sequential
-		pt, nameOk = sequential[name]
-		if !nameOk {
-			break
-		}
-		p, colorsOk = pt[colors]
-	default:
-		return nil, fmt.Errorf("brewer: palette type not known: %v", typ)
-	}
-	if !nameOk {
-		return nil, fmt.Errorf("brewer: palette %q not known", name)
-	}
-	if !colorsOk {
-		return nil, fmt.Errorf("brewer: palette %q does not support %d colors", name, colors)
-	}
-	return p, nil
+	_ = "STUB: not implemented"
+	return *new(palette.Palette), nil
 }

@@ -5,9 +5,6 @@
 package plotutil
 
 import (
-	"errors"
-	"fmt"
-
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
 	"gonum.org/v1/plot/vg"
@@ -15,8 +12,8 @@ import (
 
 type combineXYs struct{ xs, ys plotter.Valuer }
 
-func (c combineXYs) Len() int                    { return c.xs.Len() }
-func (c combineXYs) XY(i int) (float64, float64) { return c.xs.Value(i), c.ys.Value(i) }
+func (c combineXYs) Len() int                    { _ = "STUB: not implemented"; return 0 }
+func (c combineXYs) XY(i int) (float64, float64) { _ = "STUB: not implemented"; return 0, 0 }
 
 type item struct {
 	name  string
@@ -37,51 +34,11 @@ type item struct {
 // If an error occurs then none of the plotters are added
 // to the plot, and the error is returned.
 func AddStackedAreaPlots(plt *plot.Plot, xs plotter.Valuer, vs ...any) error {
-	var ps []plot.Plotter
-	var names []item
-	name := ""
-	var i int
-
-	for _, v := range vs {
-		switch t := v.(type) {
-		case string:
-			name = t
-
-		case plotter.Valuer:
-			if xs.Len() != t.Len() {
-				return errors.New("X/Y length mismatch")
-			}
-
-			// Make a line plotter and set its style.
-			l, err := plotter.NewLine(combineXYs{xs: xs, ys: t})
-			if err != nil {
-				return err
-			}
-
-			l.LineStyle.Width = vg.Points(0)
-			color := Color(i)
-			i++
-			l.FillColor = color
-
-			ps = append(ps, l)
-
-			if name != "" {
-				names = append(names, item{name: name, value: l})
-				name = ""
-			}
-
-		default:
-			panic(fmt.Sprintf("plotutil: AddStackedAreaPlots handles strings and plotter.Valuers, got %T", t))
-		}
-	}
-
-	plt.Add(ps...)
-	for _, v := range names {
-		plt.Legend.Add(v.name, v.value)
-	}
-
+	_ = "STUB: not implemented"
 	return nil
 }
+
+// Make a line plotter and set its style.
 
 // AddBoxPlots adds box plot plotters to a plot and
 // sets the X axis of the plot to be nominal.
@@ -96,29 +53,7 @@ func AddStackedAreaPlots(plt *plot.Plot, xs plotter.Valuer, vs ...any) error {
 // If an error occurs then none of the plotters are added
 // to the plot, and the error is returned.
 func AddBoxPlots(plt *plot.Plot, width vg.Length, vs ...any) error {
-	var ps []plot.Plotter
-	var names []string
-	name := ""
-	for _, v := range vs {
-		switch t := v.(type) {
-		case string:
-			name = t
-
-		case plotter.Valuer:
-			b, err := plotter.NewBoxPlot(width, float64(len(names)), t)
-			if err != nil {
-				return err
-			}
-			ps = append(ps, b)
-			names = append(names, name)
-			name = ""
-
-		default:
-			panic(fmt.Sprintf("plotutil: AddBoxPlots handles strings and plotter.Valuers, got %T", t))
-		}
-	}
-	plt.Add(ps...)
-	plt.NominalX(names...)
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -133,40 +68,7 @@ func AddBoxPlots(plt *plot.Plot, width vg.Length, vs ...any) error {
 //
 // If an error occurs then none of the plotters are added
 // to the plot, and the error is returned.
-func AddScatters(plt *plot.Plot, vs ...any) error {
-	var ps []plot.Plotter
-	var items []item
-	name := ""
-	var i int
-	for _, v := range vs {
-		switch t := v.(type) {
-		case string:
-			name = t
-
-		case plotter.XYer:
-			s, err := plotter.NewScatter(t)
-			if err != nil {
-				return err
-			}
-			s.Color = Color(i)
-			s.Shape = Shape(i)
-			i++
-			ps = append(ps, s)
-			if name != "" {
-				items = append(items, item{name: name, value: s})
-				name = ""
-			}
-
-		default:
-			panic(fmt.Sprintf("plotutil: AddScatters handles strings and plotter.XYers, got %T", t))
-		}
-	}
-	plt.Add(ps...)
-	for _, v := range items {
-		plt.Legend.Add(v.name, v.value)
-	}
-	return nil
-}
+func AddScatters(plt *plot.Plot, vs ...any) error { _ = "STUB: not implemented"; return nil }
 
 // AddLines adds Line plotters to a plot.
 // The variadic arguments must be a string
@@ -180,50 +82,7 @@ func AddScatters(plt *plot.Plot, vs ...any) error {
 //
 // If an error occurs then none of the plotters are added
 // to the plot, and the error is returned.
-func AddLines(plt *plot.Plot, vs ...any) error {
-	var ps []plot.Plotter
-	var items []item
-	name := ""
-	var i int
-	for _, v := range vs {
-		switch t := v.(type) {
-		case string:
-			name = t
-
-		case plotter.XYer:
-			l, err := plotter.NewLine(t)
-			if err != nil {
-				return err
-			}
-			l.Color = Color(i)
-			l.Dashes = Dashes(i)
-			i++
-			ps = append(ps, l)
-			if name != "" {
-				items = append(items, item{name: name, value: l})
-				name = ""
-			}
-
-		case *plotter.Function:
-			t.Color = Color(i)
-			t.Dashes = Dashes(i)
-			i++
-			ps = append(ps, t)
-			if name != "" {
-				items = append(items, item{name: name, value: t})
-				name = ""
-			}
-
-		default:
-			panic(fmt.Sprintf("plotutil: AddLines handles strings, plotter.XYers and *plotter.Function, got %T", t))
-		}
-	}
-	plt.Add(ps...)
-	for _, v := range items {
-		plt.Legend.Add(v.name, v.value)
-	}
-	return nil
-}
+func AddLines(plt *plot.Plot, vs ...any) error { _ = "STUB: not implemented"; return nil }
 
 // AddLinePoints adds Line and Scatter plotters to a
 // plot.  The variadic arguments must be either strings
@@ -236,47 +95,7 @@ func AddLines(plt *plot.Plot, vs ...any) error {
 //
 // If an error occurs then none of the plotters are added
 // to the plot, and the error is returned.
-func AddLinePoints(plt *plot.Plot, vs ...any) error {
-	var ps []plot.Plotter
-	type item struct {
-		name  string
-		value [2]plot.Thumbnailer
-	}
-	var items []item
-	name := ""
-	var i int
-	for _, v := range vs {
-		switch t := v.(type) {
-		case string:
-			name = t
-
-		case plotter.XYer:
-			l, s, err := plotter.NewLinePoints(t)
-			if err != nil {
-				return err
-			}
-			l.Color = Color(i)
-			l.Dashes = Dashes(i)
-			s.Color = Color(i)
-			s.Shape = Shape(i)
-			i++
-			ps = append(ps, l, s)
-			if name != "" {
-				items = append(items, item{name: name, value: [2]plot.Thumbnailer{l, s}})
-				name = ""
-			}
-
-		default:
-			panic(fmt.Sprintf("plotutil: AddLinePoints handles strings and plotter.XYers, got %T", t))
-		}
-	}
-	plt.Add(ps...)
-	for _, item := range items {
-		v := item.value[:]
-		plt.Legend.Add(item.name, v[0], v[1])
-	}
-	return nil
-}
+func AddLinePoints(plt *plot.Plot, vs ...any) error { _ = "STUB: not implemented"; return nil }
 
 // AddErrorBars adds XErrorBars and YErrorBars
 // to a plot.  The variadic arguments must be
@@ -288,45 +107,7 @@ func AddLinePoints(plt *plot.Plot, vs ...any) error {
 //
 // If an error occurs then none of the plotters are added
 // to the plot, and the error is returned.
-func AddErrorBars(plt *plot.Plot, vs ...any) error {
-	var ps []plot.Plotter
-	for i, v := range vs {
-		added := false
-
-		if xerr, ok := v.(interface {
-			plotter.XYer
-			plotter.XErrorer
-		}); ok {
-			e, err := plotter.NewXErrorBars(xerr)
-			if err != nil {
-				return err
-			}
-			e.Color = Color(i)
-			ps = append(ps, e)
-			added = true
-		}
-
-		if yerr, ok := v.(interface {
-			plotter.XYer
-			plotter.YErrorer
-		}); ok {
-			e, err := plotter.NewYErrorBars(yerr)
-			if err != nil {
-				return err
-			}
-			e.Color = Color(i)
-			ps = append(ps, e)
-			added = true
-		}
-
-		if added {
-			continue
-		}
-		panic(fmt.Sprintf("plotutil: AddErrorBars expects plotter.XErrorer or plotter.YErrorer, got %T", v))
-	}
-	plt.Add(ps...)
-	return nil
-}
+func AddErrorBars(plt *plot.Plot, vs ...any) error { _ = "STUB: not implemented"; return nil }
 
 // AddXErrorBars adds XErrorBars to a plot.
 // The variadic arguments must be
@@ -341,16 +122,7 @@ func AddXErrorBars(plt *plot.Plot, es ...interface {
 	plotter.XYer
 	plotter.XErrorer
 }) error {
-	var ps []plot.Plotter
-	for i, e := range es {
-		bars, err := plotter.NewXErrorBars(e)
-		if err != nil {
-			return err
-		}
-		bars.Color = Color(i)
-		ps = append(ps, bars)
-	}
-	plt.Add(ps...)
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -367,15 +139,6 @@ func AddYErrorBars(plt *plot.Plot, es ...interface {
 	plotter.XYer
 	plotter.YErrorer
 }) error {
-	var ps []plot.Plotter
-	for i, e := range es {
-		bars, err := plotter.NewYErrorBars(e)
-		if err != nil {
-			return err
-		}
-		bars.Color = Color(i)
-		ps = append(ps, bars)
-	}
-	plt.Add(ps...)
+	_ = "STUB: not implemented"
 	return nil
 }

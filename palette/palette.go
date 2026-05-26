@@ -12,7 +12,6 @@ package palette // import "gonum.org/v1/plot/palette"
 import (
 	"errors"
 	"image/color"
-	"math"
 )
 
 // Palette is a collection of colors ordered into a palette.
@@ -109,80 +108,31 @@ var (
 )
 
 // Complement returns the complementary hue of a Hue.
-func (h Hue) Complement() Hue { return Hue(math.Mod(float64(h+0.5), 1)) }
+func (h Hue) Complement() Hue { _ = "STUB: not implemented"; return *new(Hue) }
 
 type palette []color.Color
 
-func (p palette) Colors() []color.Color { return p }
+func (p palette) Colors() []color.Color { _ = "STUB: not implemented"; return nil }
 
 type divergingPalette []color.Color
 
-func (p divergingPalette) Colors() []color.Color { return p }
+func (p divergingPalette) Colors() []color.Color { _ = "STUB: not implemented"; return nil }
 
-func (d divergingPalette) CriticalIndex() (low, high int) {
-	l := len(d)
-	return (l - 1) / 2, l / 2
-}
+func (d divergingPalette) CriticalIndex() (low, high int) { _ = "STUB: not implemented"; return 0, 0 }
 
 // Rainbow returns a rainbow palette with the specified number of colors, saturation
 // value and alpha, and hues in the specified range.
 func Rainbow(colors int, start, end Hue, sat, val, alpha float64) Palette {
-	p := make(palette, colors)
-	hd := float64(end-start) / float64(colors-1)
-	c := HSVA{V: val, S: sat, A: alpha}
-	for i := range p {
-		c.H = float64(start) + float64(i)*hd
-		p[i] = color.NRGBAModel.Convert(c)
-	}
-
-	return p
+	_ = "STUB: not implemented"
+	return *new(Palette)
 }
 
 // Heat returns a red to yellow palette with the specified number of colors and alpha.
-func Heat(colors int, alpha float64) Palette {
-	p := make(palette, colors)
-	j := colors / 4
-	i := colors - j
-
-	hd := float64(Yellow-Red) / float64(i-1)
-	c := HSVA{V: 1, S: 1, A: alpha}
-	for k := range p[:i] {
-		c.H = float64(Red) + float64(k)*hd
-		p[k] = color.NRGBAModel.Convert(c)
-	}
-	if j == 0 {
-		return p
-	}
-
-	c.H = float64(Yellow)
-	start, end := 1-1/(2*float64(j)), 1/(2*float64(j))
-	c.S = start
-	sd := (end - start) / float64(j-1)
-	for k := range p[i:] {
-		c.S = start + float64(k)*sd
-		p[k+i] = color.NRGBAModel.Convert(c)
-	}
-
-	return p
-}
+func Heat(colors int, alpha float64) Palette { _ = "STUB: not implemented"; return *new(Palette) }
 
 // Radial return a diverging palette across the specified range, through white and with
 // the specified alpha.
 func Radial(colors int, start, end Hue, alpha float64) DivergingPalette {
-	p := make(divergingPalette, colors)
-	h := colors / 2
-	c := HSVA{V: 1, A: alpha}
-	ds := 0.5 / float64(h)
-	for i := range p[:h] {
-		c.H = float64(start)
-		c.S = 0.5 - float64(i)*ds
-		p[i] = color.NRGBAModel.Convert(c)
-		c.H = float64(end)
-		p[len(p)-1-i] = color.NRGBAModel.Convert(c)
-	}
-	if colors%2 != 0 {
-		p[colors/2] = color.NRGBA{0xff, 0xff, 0xff, byte(math.MaxUint8 * alpha)}
-	}
-
-	return p
+	_ = "STUB: not implemented"
+	return *new(DivergingPalette)
 }
